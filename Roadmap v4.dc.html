@@ -442,7 +442,7 @@ function shiftF(e,mode,dm){
 }
 
 class Component extends DCLogic {
-  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'theme',g1:'app',g2:'none',nq:6,details:true,fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
+  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'app',g1:'app',g2:'none',nq:6,details:true,fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
     draft:null,newUpd:'',picker:null,dragId:null,overKey:null,cw:0,tdrag:null,confirm:null,theme:readTheme()};
   // Light/dark: follows the OS until the user picks one with the toggle; the choice is remembered per browser.
   effTheme(){return this.state.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
@@ -550,7 +550,7 @@ class Component extends DCLogic {
     const tabs=[['board','Board'],['list','List'],['matrix','Matrix'],['timeline','Timeline']].map(([v,label])=>({label,set:()=>this.setState({view:v}),style:{border:0,padding:'7px 14px',borderRadius:'9px',cursor:'pointer',fontSize:'14px',fontWeight:600,background:view===v?'var(--surface)':'transparent',color:view===v?'var(--ink)':'var(--ink-2)',boxShadow:view===v?'0 1px 3px rgba(28,36,48,.12)':'none'}}));
     const viewTitle={board:'Board',list:'List',matrix:'Matrix',timeline:'Timeline'}[view];
     const gKey={board:'boardBy',list:'listBy',matrix:'matrixBy'}[view];
-    const gList=view==='matrix'?['theme','app']:view==='board'?['stage','theme','app']:['theme','app','stage'];
+    const gList=view==='matrix'?['app','theme']:['app','stage','theme'];
     const groupOpts=gKey?gList.map(v=>({label:LBL[v],set:()=>this.setState({[gKey]:v}),style:segStyle(st[gKey]===v)})):[];
     const tog=(k,v)=>()=>this.setState(s=>({[k]:s[k].includes(v)?s[k].filter(x=>x!==v):[...s[k],v]}));
     const fCount=st.fApps.length+st.fThemes.length+(stagesDefault?0:1);
