@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<title>Roadmapper</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>/* apply a saved theme before first paint, so there is no light flash in dark mode */
 try{const t=localStorage.getItem("lg-roadmap-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <script src="./support.js"></script>
@@ -66,7 +68,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 <div style="min-height:100vh;display:flex;flex-direction:column">
 
 <div style="display:flex;align-items:center;gap:20px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap">
-<div style="display:flex;align-items:center;gap:10px;font-family:var(--font-title);font-weight:700;font-size:18px;letter-spacing:.005em;white-space:nowrap"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="5" width="12" height="4" rx="2" fill="var(--accent)"></rect><rect x="8" y="11" width="13" height="4" rx="2" fill="var(--green)"></rect><rect x="5" y="17" width="10" height="4" rx="2" fill="var(--amber)"></rect></svg>Roadmap</div>
+<div style="display:flex;align-items:center;gap:10px;font-family:var(--font-title);font-weight:700;font-size:18px;letter-spacing:.005em;white-space:nowrap"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="5" width="12" height="4" rx="2" fill="var(--accent)"></rect><rect x="8" y="11" width="13" height="4" rx="2" fill="var(--green)"></rect><rect x="5" y="17" width="10" height="4" rx="2" fill="var(--amber)"></rect></svg>Roadmapper</div>
 <div style="display:flex;gap:4px;background:var(--canvas);padding:4px;border-radius:12px;flex:none">
 <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.set }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
 </div>

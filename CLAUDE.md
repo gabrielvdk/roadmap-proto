@@ -11,6 +11,7 @@ Background reading: `README.md` (original handoff and domain model) and `CONVERS
 - `_ds/…/styles.css`, `_ds_bundle.js`: original design-system files. Their `--color-*` variables are now **mapped onto the EOS tokens** in the `<style>` block of v4, so don't restyle via `_ds`.
 - `serve.ps1`: a static PowerShell server. `.claude/launch.json` has the `roadmapper` entry on **port 8090** (8080 is used by EOSTracker).
 - `.nojekyll`: required so GitHub Pages serves the `_ds/` folder. Don't remove it.
+- `favicon.svg`: the app icon (three bars, same as the logo in the top bar); linked from v4 and `index.html`. The app is called **Roadmapper** (page title and top bar).
 
 ## Running it
 There's no Node or Python on this machine. In the Claude Code browser pane, start it with `preview_start` using the name `roadmapper`, or run:
