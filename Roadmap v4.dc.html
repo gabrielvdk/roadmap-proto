@@ -442,7 +442,7 @@ function shiftF(e,mode,dm){
 }
 
 class Component extends DCLogic {
-  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'app',g1:'app',g2:'none',nq:6,details:true,fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
+  state={epics:load(),view:'board',boardBy:'stage',listBy:'app',matrixBy:'app',g1:'app',g2:'none',nq:6,details:true,fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
     draft:null,newUpd:'',picker:null,dragId:null,overKey:null,cw:0,tdrag:null,confirm:null,theme:readTheme()};
   // Light/dark: follows the OS until the user picks one with the toggle; the choice is remembered per browser.
   effTheme(){return this.state.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
