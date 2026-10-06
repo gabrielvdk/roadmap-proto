@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-8ee65716-40ef-437f-b75b-3f18408c96f8/styles.css">
+<script src="_ds/industry-8ee65716-40ef-437f-b75b-3f18408c96f8/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-900)}button,input,select,textarea{font:inherit;color:inherit}</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<div style="display:flex;align-items:center;gap:16px;height:48px;padding:0 20px;background:var(--color-accent-900);color:white">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:21px;letter-spacing:.01em">Roadmap</span>
+<span style="font-size:13px;opacity:.85">Epics across all applications</span>
+<button onClick="{{ newEpic }}" style="margin-left:auto;display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;border:0;border-radius:var(--radius-md);background:white;color:var(--color-accent-900);font-weight:600;font-size:13.5px;cursor:pointer" style-hover="background:var(--color-accent-100)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"></path></svg>New epic</button>
+</div>
+
+<div style="display:flex;align-items:center;gap:20px;padding:0 20px;min-height:44px;background:white;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+<div style="display:flex;gap:4px;align-self:stretch">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.set }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+</div>
+<div style="margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:6px 0;font-size:13px">
+<sc-if value="{{ showGroupSeg }}" hint-placeholder-val="{{ true }}">
+<span style="color:var(--color-neutral-700)">Group by</span>
+<div style="display:flex;border:1px solid var(--color-neutral-300);border-radius:var(--radius-lg);overflow:hidden"><sc-for list="{{ groupOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.set }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div>
+</sc-if>
+<sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+<span style="color:var(--color-neutral-700)">Group by</span>
+<select value="{{ g1 }}" onChange="{{ setG1 }}" style="height:30px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;padding:0 6px"><sc-for list="{{ g1Opts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+<span style="color:var(--color-neutral-700)">then</span>
+<select value="{{ g2 }}" onChange="{{ setG2 }}" style="height:30px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;padding:0 6px"><sc-for list="{{ g2Opts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+<span style="width:1px;height:20px;background:var(--color-divider)"></span>
+<span style="color:var(--color-neutral-700)">Quarters</span>
+<div style="display:flex;border:1px solid var(--color-neutral-300);border-radius:var(--radius-lg);overflow:hidden"><sc-for list="{{ qOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.set }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div>
+<div style="display:flex;gap:2px">
+<button onClick="{{ shiftBack }}" title="Earlier" style="width:30px;height:30px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;cursor:pointer" style-hover="background:var(--color-accent-100)">‹</button>
+<button onClick="{{ goToday }}" style="height:30px;padding:0 10px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;cursor:pointer" style-hover="background:var(--color-accent-100)">Today</button>
+<button onClick="{{ shiftFwd }}" title="Later" style="width:30px;height:30px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;cursor:pointer" style-hover="background:var(--color-accent-100)">›</button>
+</div>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked="{{ details }}" onChange="{{ toggleDetails }}" style="accent-color:var(--color-accent-700);width:15px;height:15px;margin:0">Details</label>
+</sc-if>
+</div>
+</div>
+
+<div style="flex:1;padding:16px 20px 20px;min-width:0">
+
+<sc-if value="{{ isBoard }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:8px">
+<sc-for list="{{ boardGroups }}" as="g" hint-placeholder-count="6">
+<div style="flex:0 0 268px;background:var(--color-neutral-200);border-radius:var(--radius-lg);padding:8px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;padding:4px 6px 2px"><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">{{ g.label }}</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-700);background:white;border-radius:10px;padding:1px 8px">{{ g.count }}</span></div>
+<sc-for list="{{ g.items }}" as="e" hint-placeholder-count="2">
+<div onClick="{{ e.open }}" style="background:white;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:10px 12px;display:flex;flex-direction:column;gap:6px;cursor:pointer" style-hover="box-shadow:var(--shadow-md)">
+<div style="font-weight:600;font-size:14px;line-height:1.3">{{ e.title }}</div>
+<div style="font-size:12.5px;color:var(--color-neutral-700)">{{ e.cat }}</div>
+<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--color-neutral-800);font-variant-numeric:tabular-nums"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>{{ e.forecastTxt }}<sc-if value="{{ e.slip }}" hint-placeholder-val="{{ false }}"><span style="{{ e.slipStyle }}">{{ e.slipShort }}</span></sc-if></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="{{ e.badge }}"><sc-if value="{{ e.done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{ e.health }}</span><sc-if value="{{ e.sub }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;padding:2px 8px;border-radius:10px;background:var(--color-neutral-200);color:var(--color-neutral-800)">{{ e.sub }}</span></sc-if></div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;max-width:1400px">
+<sc-for list="{{ listGroups }}" as="g" hint-placeholder-count="4">
+<div style="background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden">
+<div style="display:flex;align-items:baseline;gap:10px;padding:10px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-family:var(--font-heading);font-weight:600;font-size:18px">{{ g.label }}</span><span style="font-size:12.5px;color:var(--color-neutral-700)">{{ g.count }} epics</span></div>
+<div style="display:grid;grid-template-columns:minmax(220px,2fr) 120px 190px minmax(280px,4fr);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-700);background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider)"><span style="padding:7px 16px">Epic</span><span style="padding:7px 12px">Health</span><span style="padding:7px 12px">Forecast</span><span style="padding:7px 16px 7px 12px">Last status update</span></div>
+<sc-for list="{{ g.items }}" as="e" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:minmax(220px,2fr) 120px 190px minmax(280px,4fr);border-bottom:1px solid var(--color-divider);align-items:start" style-hover="background:var(--color-neutral-100)">
+<div style="padding:10px 16px;display:flex;flex-direction:column;gap:2px"><button onClick="{{ e.open }}" style="all:unset;cursor:pointer;font-weight:600;font-size:14.5px;line-height:1.3" style-hover="color:var(--color-accent-700);text-decoration:underline">{{ e.title }}</button><span style="font-size:12.5px;color:var(--color-neutral-700)">{{ e.app }}</span><span style="font-size:12.5px;color:var(--color-neutral-700)">{{ e.theme }}</span></div>
+<div style="padding:10px 12px"><span style="{{ e.badge }}"><sc-if value="{{ e.done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{ e.health }}</span></div>
+<div style="padding:10px 12px;font-size:13px;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;gap:2px"><span>{{ e.forecastTxt }}</span><sc-if value="{{ e.slip }}" hint-placeholder-val="{{ false }}"><span style="{{ e.slipStyle }}">{{ e.slipTxt }}</span></sc-if></div>
+<div style="padding:10px 16px 10px 12px;display:flex;flex-direction:column;gap:3px"><sc-if value="{{ e.last }}" hint-placeholder-val="{{ true }}"><span style="font-size:13.5px;line-height:1.45;text-wrap:pretty">{{ e.last.text }}</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ e.last.when }} · {{ e.last.author }}</span></sc-if></div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMatrix }}" hint-placeholder-val="{{ false }}">
+<div style="background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:auto">
+<div style="display:grid;grid-template-columns:150px repeat(6,minmax(150px,1fr));min-width:1050px">
+<div style="background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider)"></div>
+<sc-for list="{{ stageCols }}" as="s" hint-placeholder-count="6"><div style="padding:8px 10px;font-family:var(--font-heading);font-weight:600;font-size:16px;background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);border-left:1px solid var(--color-divider)">{{ s }}</div></sc-for>
+<sc-for list="{{ matrixRows }}" as="r" hint-placeholder-count="5">
+<div style="padding:8px 10px;font-weight:600;font-size:13.5px;line-height:1.25;border-bottom:1px solid var(--color-divider)">{{ r.label }}</div>
+<sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="6">
+<div style="padding:6px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--color-divider);border-left:1px solid var(--color-divider);min-height:40px">
+<sc-for list="{{ c.items }}" as="e" hint-placeholder-count="1">
+<div onClick="{{ e.open }}" style="cursor:pointer;display:flex;flex-direction:column;gap:1px;padding:4px 7px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white" style-hover="border-color:var(--color-accent);box-shadow:var(--shadow-sm)">
+<div style="display:flex;gap:6px;align-items:center"><span style="{{ e.dot }}"></span><span style="font-size:12px;font-weight:600;line-height:1.25">{{ e.title }}</span></div>
+<span style="font-size:11px;color:var(--color-neutral-700);line-height:1.3">{{ e.mOther }}</span>
+<span style="font-size:11px;color:var(--color-neutral-700);line-height:1.3;font-variant-numeric:tabular-nums">{{ e.forecastTxt }}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;gap:16px;padding:10px 2px 0;font-size:12px;color:var(--color-neutral-700)"><sc-for list="{{ legend }}" as="h" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:6px"><span style="{{ h.dot }}"></span>{{ h.label }}</span></sc-for></div>
+</sc-if>
+
+<sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+<div style="background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden">
+<div style="display:grid;grid-template-columns:270px minmax(0,1fr)">
+<div style="background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);padding:6px 12px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-700);display:flex;align-items:flex-end">Epic</div>
+<div style="{{ qHeadStyle }}">
+<sc-for list="{{ quarters }}" as="q" hint-placeholder-count="6"><div style="border-left:1px solid var(--color-divider);padding:4px 0 3px;min-width:0"><div style="padding:0 6px;font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden">{{ q.label }}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);font-size:10.5px;color:var(--color-neutral-700)"><sc-for list="{{ q.months }}" as="m" hint-placeholder-count="3"><span style="padding:0 6px">{{ m }}</span></sc-for></div></div></sc-for>
+</div>
+<sc-for list="{{ tRows }}" as="r" hint-placeholder-count="10">
+<sc-if value="{{ r.isG1 }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;display:flex;align-items:center;gap:8px;height:28px;padding:0 12px;background:var(--color-accent-100);border-bottom:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:15.5px;color:var(--color-accent-900)">{{ r.label }}<span style="font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--color-neutral-700)">{{ r.count }}</span></div></sc-if>
+<sc-if value="{{ r.isG2 }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;display:flex;align-items:center;gap:8px;height:24px;padding:0 12px 0 26px;background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);font-weight:600;font-size:12.5px;color:var(--color-neutral-800)">{{ r.label }}<span style="font-weight:400;font-size:11.5px;color:var(--color-neutral-700)">{{ r.count }}</span></div></sc-if>
+<sc-if value="{{ r.isE }}" hint-placeholder-val="{{ true }}">
+<div style="{{ r.labelStyle }}"><button onClick="{{ r.open }}" style="all:unset;cursor:pointer;font-size:13px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="color:var(--color-accent-700);text-decoration:underline">{{ r.title }}</button><sc-if value="{{ details }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;color:var(--color-neutral-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2">{{ r.tSub }}</span></sc-if></div>
+<div style="{{ r.cellStyle }}">
+<div style="{{ r.bar.f }}"></div>
+<sc-if value="{{ r.bar.hasSlip }}" hint-placeholder-val="{{ false }}"><div style="{{ r.bar.s }}"></div><span style="{{ r.bar.sl }}">{{ r.slipShort }}</span></sc-if>
+<sc-if value="{{ r.bar.hasA }}" hint-placeholder-val="{{ false }}"><div style="{{ r.bar.a }}"></div></sc-if>
+<sc-if value="{{ showToday }}" hint-placeholder-val="{{ false }}"><div style="{{ todayStyle }}"></div></sc-if>
+</div>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;gap:18px;align-items:center;padding:10px 2px 0;font-size:12px;color:var(--color-neutral-800);flex-wrap:wrap">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:24px;height:10px;border-radius:3px;background:oklch(0.93 0.06 150);border:1px solid oklch(0.55 0.1 150)"></span>Forecast, colored by health</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:24px;height:10px;border-radius:3px;border:1px solid oklch(0.5 0.15 25);background:repeating-linear-gradient(135deg,oklch(0.5 0.15 25) 0 1.5px,transparent 1.5px 5px)"></span>Slip past planned end</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:24px;height:3px;background:var(--color-neutral-800)"></span>Actual</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:2px;height:14px;background:var(--color-accent-700)"></span>Today</span>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-text) 40%, transparent);display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto;z-index:10">
+<div onClick="{{ stop }}" style="width:100%;max-width:960px;background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--color-divider)">
+<input value="{{ d.title }}" onChange="{{ on.title }}" placeholder="Epic title" style="flex:1;border:1px solid transparent;border-radius:var(--radius-md);padding:4px 8px;margin-left:-8px;font-family:var(--font-heading);font-weight:600;font-size:24px;background:transparent;outline:none" style-hover="border-color:var(--color-neutral-300)" style-focus="border-color:var(--color-accent)">
+<button onClick="{{ closeModal }}" title="Close" style="width:32px;height:32px;border:0;border-radius:var(--radius-md);background:transparent;cursor:pointer;font-size:20px;color:var(--color-neutral-700)" style-hover="background:var(--color-neutral-200)">×</button>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)">
+<div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px;border-right:1px solid var(--color-divider)">
+<label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Description — what this epic delivers<textarea value="{{ d.desc }}" onChange="{{ on.desc }}" rows="3" style="border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:8px 10px;font-size:14px;font-weight:400;line-height:1.45;resize:vertical;outline:none;color:var(--color-text)" style-focus="border-color:var(--color-accent);box-shadow:0 0 0 2px var(--color-accent-200)"></textarea></label>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Application<select value="{{ d.app }}" onChange="{{ on.app }}" style="height:34px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;background:white;font-size:14px;font-weight:400"><sc-for list="{{ appList }}" as="o" hint-placeholder-count="5"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Theme<select value="{{ d.theme }}" onChange="{{ on.theme }}" style="height:34px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;background:white;font-size:14px;font-weight:400"><sc-for list="{{ themeList }}" as="o" hint-placeholder-count="5"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Stage<select value="{{ d.stage }}" onChange="{{ on.stage }}" style="height:34px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;background:white;font-size:14px;font-weight:400"><sc-for list="{{ stageOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+<label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Productization track<select value="{{ d.sub }}" onChange="{{ on.sub }}" disabled="{{ subDisabled }}" style="height:34px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;background:white;font-size:14px;font-weight:400"><sc-for list="{{ subOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Health</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ healthBtns }}" as="h" hint-placeholder-count="4"><button onClick="{{ h.set }}" style="{{ h.style }}"><sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{ h.label }}</button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Dates</span>
+<div style="display:grid;grid-template-columns:76px 1fr 1fr;gap:6px 10px;align-items:center;font-size:13px">
+<span></span><span style="font-size:11.5px;color:var(--color-neutral-700)">Start</span><span style="font-size:11.5px;color:var(--color-neutral-700)">End</span>
+<sc-for list="{{ dateRows }}" as="r" hint-placeholder-count="3">
+<span style="font-weight:500">{{ r.label }}</span>
+<input type="month" value="{{ r.s }}" onChange="{{ r.onS }}" style="height:32px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;font-size:13px;min-width:0">
+<input type="month" value="{{ r.e }}" onChange="{{ r.onE }}" style="height:32px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:0 8px;font-size:13px;min-width:0">
+</sc-for>
+</div>
+<sc-if value="{{ dSlip }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;color:oklch(0.5 0.15 25)">{{ dSlipTxt }}</span></sc-if>
+</div>
+</div>
+<div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px;background:var(--color-neutral-100);min-height:0">
+<span style="font-size:12.5px;font-weight:600;color:var(--color-neutral-800)">Status updates</span>
+<div style="display:flex;flex-direction:column;gap:6px">
+<textarea value="{{ newUpd }}" onChange="{{ setNewUpd }}" rows="3" placeholder="Write an update on progress, risks or decisions…" style="border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);padding:8px 10px;font-size:13.5px;line-height:1.45;resize:vertical;background:white;outline:none" style-focus="border-color:var(--color-accent);box-shadow:0 0 0 2px var(--color-accent-200)"></textarea>
+<button onClick="{{ addUpdate }}" disabled="{{ noUpd }}" style="align-self:flex-end;height:30px;padding:0 14px;border:0;border-radius:var(--radius-md);background:var(--color-accent-700);color:white;font-weight:600;font-size:13px;cursor:pointer" style-hover="background:var(--color-accent-800)">Add update</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow:auto">
+<sc-for list="{{ dUpdates }}" as="u" hint-placeholder-count="2">
+<div style="background:white;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:9px 12px;display:flex;flex-direction:column;gap:3px">
+<div style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--color-neutral-700)"><span style="width:22px;height:22px;border-radius:50%;background:var(--color-accent-200);color:var(--color-accent-900);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600">{{ u.initials }}</span><span style="font-weight:600;color:var(--color-neutral-800)">{{ u.author }}</span><span>{{ u.when }}</span></div>
+<span style="font-size:13.5px;line-height:1.45;text-wrap:pretty">{{ u.text }}</span>
+</div>
+</sc-for>
+<sc-if value="{{ noUpdates }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:var(--color-neutral-700)">No updates yet.</span></sc-if>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--color-divider)">
+<button onClick="{{ closeModal }}" style="height:34px;padding:0 16px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:white;cursor:pointer;font-size:13.5px" style-hover="background:var(--color-neutral-100)">Cancel</button>
+<button onClick="{{ save }}" style="height:34px;padding:0 18px;border:0;border-radius:var(--radius-md);background:var(--color-accent-700);color:white;font-weight:600;cursor:pointer;font-size:13.5px" style-hover="background:var(--color-accent-800)">Save</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const THEMES=['Energy Management','IPM','Yield Prediction','Cultivation'];
+const APPS=['IIVO','Intelligent Algorithms','LetsGrow.com','Intelligent Assistance'];
+const STAGES=['Validation','Prototyping','Development','Productization','Launch','Learn'];
+const SUBS=['Proposition','Documentation','Enablement'];
+const HEALTH={'On track':{bg:'oklch(0.93 0.06 150)',fg:'oklch(0.40 0.10 150)',bd:'oklch(0.55 0.10 150)'},'At risk':{bg:'oklch(0.93 0.07 75)',fg:'oklch(0.46 0.11 60)',bd:'oklch(0.66 0.13 65)'},'Late':{bg:'oklch(0.92 0.05 25)',fg:'oklch(0.47 0.15 25)',bd:'oklch(0.6 0.15 25)'},'Done':{bg:'oklch(0.93 0.06 150)',fg:'oklch(0.40 0.10 150)',bd:'oklch(0.55 0.10 150)'}};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const KEY='lg-roadmap-v2';
+const SEED=[
+['Heat demand forecasting','Predicts 48-hour heat demand per compartment so growers can plan boiler and buffer use.','IIVO','Energy Management',2,'','On track','2026-05','2026-12','2026-06','2027-01','2026-06','',[['2026-07-14','Sanne','Kick-off done, data access arranged for three pilot growers.'],['2026-09-22','Sanne','Model v2 in test with three pilot growers. Accuracy within 8% on most days; next step is the IIVO screen design.']]],
+['CHP dispatch optimiser','Schedules CHP runs against day-ahead power prices and heat demand.','Intelligent Algorithms','Energy Management',1,'','At risk','2026-08','2027-02','2026-10','2027-04','2026-10','',[['2026-09-30','Pieter','Price feed contract not signed yet; start moved two months. Escalated to management.']]],
+['Energy dashboard v2','Gas, power and heat balance per site with monthly benchmarks.','LetsGrow.com','Energy Management',3,'Documentation','On track','2026-03','2026-09','2026-03','2026-11','2026-03','',[['2026-09-18','Lotte','Feature complete. Help-centre articles in review, release notes drafted.']]],
+['Disease risk alerts','Notifies growers when climate conditions favour botrytis or mildew.','Intelligent Assistance','IPM',0,'','On track','2026-11','2027-03','2026-11','2027-03','','',[['2026-09-12','Eva','Interviews planned with 8 growers in November.']]],
+['Biological control planner','Plans the release of beneficials based on scouting data.','LetsGrow.com','IPM',4,'','On track','2026-01','2026-08','2026-01','2026-09','2026-01','2026-09',[['2026-09-26','Lotte','Released to all customers. Launch webinar scheduled 15 October.']]],
+['Tomato yield prediction','Weekly kg/m² forecast for tomato, six weeks ahead.','Intelligent Algorithms','Yield Prediction',3,'Proposition','On track','2026-02','2026-10','2026-02','2026-12','2026-02','',[['2026-09-24','Pieter','Pricing tiers being finalised with sales.']]],
+['Yield prediction in IIVO','Shows yield forecasts next to the climate strategy in IIVO.','IIVO','Yield Prediction',1,'','At risk','2026-10','2027-04','2026-12','2027-06','','',[['2026-09-27','Sanne','API contract with the Algorithms team still open.']]],
+['Harvest forecast reporting','Shares harvest forecasts with buyers and packers.','LetsGrow.com','Yield Prediction',0,'','On track','2027-03','2027-09','2027-03','2027-09','','',[['2026-09-10','Lotte','Validating willingness to pay with four packers.']]],
+['Climate setpoint advice','Recommends daily temperature and humidity setpoints.','Intelligent Assistance','Cultivation',2,'','On track','2026-07','2027-01','2026-07','2027-01','2026-07','',[['2026-09-25','Eva','Beta with five growers starts in January.']]],
+['Irrigation strategy','Optimises irrigation start and frequency using drain data.','IIVO','Cultivation',1,'','On track','2027-02','2027-08','2027-02','2027-08','','',[['2026-09-08','Sanne','Kick-off planned for February.']]]
+].map((r,i)=>({id:'e'+(i+1),title:r[0],desc:r[1],app:r[2],theme:r[3],stage:r[4],sub:r[5],health:r[6],ps:r[7],pe:r[8],fs:r[9],fe:r[10],as:r[11],ae:r[12],updates:r[13].map(u=>({date:u[0],author:u[1],text:u[2]}))}));
+const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(s)&&s.length)return s;}catch(e){}return SEED;};
+const abs=s=>{if(!s)return null;const[y,m]=s.split('-').map(Number);return y*12+m-1;};
+const fs=s=>{if(!s)return '…';const[y,m]=s.split('-').map(Number);return MON[m-1]+' ’'+String(y).slice(2);};
+const rng=(a,b)=>a||b?fs(a)+' – '+fs(b):'Not set';
+const fday=s=>{const[y,m,d]=s.split('-').map(Number);return d+' '+MON[m-1]+' '+y;};
+const NOW=new Date();
+const TODAY=NOW.getFullYear()*12+NOW.getMonth()+(NOW.getDate()-1)/31;
+const todayStr=()=>NOW.toISOString().slice(0,10);
+const keyOf=(e,by)=>by==='theme'?e.theme:by==='app'?e.app:STAGES[e.stage];
+const keysOf=by=>by==='theme'?THEMES:by==='app'?APPS:STAGES;
+const LBL={theme:'Theme',app:'Application',stage:'Stage',none:'None'};
+const badge=h=>({display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'12px',fontWeight:600,padding:'2px 9px',borderRadius:'10px',background:HEALTH[h].bg,color:HEALTH[h].fg,whiteSpace:'nowrap'});
+const dot=h=>({width:'8px',height:'8px',flex:'none',borderRadius:'50%',background:HEALTH[h].bd});
+const segStyle=on=>({border:0,padding:'0 12px',height:'28px',cursor:'pointer',fontSize:'13px',background:on?'var(--color-accent-700)':'white',color:on?'white':'var(--color-text)',fontWeight:on?600:400});
+
+class Component extends DCLogic {
+  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'theme',g1:'app',g2:'theme',nq:6,qStart:Math.floor(TODAY/3)*3-3,details:true,draft:null,newUpd:''};
+  componentDidMount(){this._k=e=>{if(e.key==='Escape'&&this.state.draft)this.close();};window.addEventListener('keydown',this._k);}
+  componentWillUnmount(){window.removeEventListener('keydown',this._k);}
+  persist(epics){this.setState({epics});try{localStorage.setItem(KEY,JSON.stringify(epics));}catch(e){}}
+  open(e){this.setState({draft:JSON.parse(JSON.stringify(e)),newUpd:''});}
+  close(){this.setState({draft:null,newUpd:''});}
+  setD(k,v){this.setState(s=>({draft:{...s.draft,[k]:v}}));}
+  save(){const d=this.state.draft;if(!d.title.trim())d.title='Untitled epic';const ex=this.state.epics.some(e=>e.id===d.id);this.persist(ex?this.state.epics.map(e=>e.id===d.id?d:e):[...this.state.epics,d]);this.close();}
+  addUpdate(){const t=this.state.newUpd.trim();if(!t)return;const u={date:todayStr(),author:'You',text:t};const d={...this.state.draft,updates:[...this.state.draft.updates,u]};this.setState({draft:d,newUpd:''});if(this.state.epics.some(e=>e.id===d.id))this.persist(this.state.epics.map(e=>e.id===d.id?{...e,updates:d.updates}:e));}
+  deco(e){
+    const slipM=(abs(e.fe)??0)-(abs(e.pe)??0);
+    const ups=e.updates.slice().sort((a,b)=>b.date.localeCompare(a.date));
+    const l=ups[0];
+    return {...e,badge:badge(e.health),dot:dot(e.health),done:e.health==='Done',forecastTxt:rng(e.fs||e.ps,e.fe||e.pe),
+      slip:!!(e.pe&&e.fe&&slipM>0),slipTxt:'+'+slipM+' mo vs. plan',slipShort:'+'+slipM+' mo',
+      slipStyle:{fontSize:'11.5px',fontWeight:600,color:HEALTH.Late.fg},
+      last:l?{text:l.text,when:fday(l.date),author:l.author}:null,
+      open:()=>this.open(e)};
+  }
+  groups(by,eps){return keysOf(by).map(k=>{const items=eps.filter(e=>keyOf(e,by)===k);return {label:k,count:items.length,items};});}
+  bar(e,W,N,rowH){
+    const pct=v=>Math.max(0,Math.min(N,v-W))/N*100;
+    const f0=abs(e.fs||e.ps),f1=(abs(e.fe||e.pe)??f0)+1,p1=e.pe?abs(e.pe)+1:f1;
+    const H=HEALTH[e.health];
+    const L=pct(f0),R=pct(f1),P=Math.max(L,pct(p1));
+    const slip=f1>p1;
+    const hasA=!!e.as;
+    const bh=this.state.details?12:10;
+    const top=Math.round((rowH-bh)/2-(hasA?2:0));
+    const a0=pct(abs(e.as)),a1=pct(e.ae?abs(e.ae)+1:TODAY);
+    return {
+      f:{position:'absolute',top:top+'px',height:bh+'px',left:L+'%',width:Math.max(0,(slip?P:R)-L)+'%',background:H.bg,border:'1px solid '+H.bd,borderRadius:slip?'3px 0 0 3px':'3px',boxSizing:'border-box'},
+      hasSlip:slip&&R>P,
+      s:{position:'absolute',top:top+'px',height:bh+'px',left:P+'%',width:(R-P)+'%',border:'1px solid '+HEALTH.Late.bd,borderRadius:'0 3px 3px 0',background:'repeating-linear-gradient(135deg,'+HEALTH.Late.bd+' 0 1.5px,transparent 1.5px 5px)',boxSizing:'border-box'},
+      sl:{position:'absolute',top:(top-2)+'px',left:'calc('+R+'% + 5px)',fontSize:'11px',lineHeight:(bh+4)+'px',fontWeight:600,color:HEALTH.Late.fg,whiteSpace:'nowrap'},
+      hasA:hasA&&a1>a0,
+      a:{position:'absolute',top:(top+bh+2)+'px',height:'3px',left:a0+'%',width:(a1-a0)+'%',background:'var(--color-neutral-800)',borderRadius:'2px'}
+    };
+  }
+  renderVals(){
+    const st=this.state;
+    const eps=st.epics.map(e=>this.deco(e)).sort((a,b)=>(a.fs||a.ps||'').localeCompare(b.fs||b.ps||''));
+    const view=st.view;
+    const tabs=[['board','Board'],['list','List'],['matrix','Matrix'],['timeline','Timeline']].map(([v,label])=>({label,set:()=>this.setState({view:v}),style:{border:0,background:'transparent',padding:'0 12px',cursor:'pointer',fontSize:'14px',fontWeight:view===v?600:400,color:view===v?'var(--color-accent-900)':'var(--color-neutral-800)',boxShadow:view===v?'inset 0 -3px 0 var(--color-accent-700)':'none'}}));
+    const gKey={board:'boardBy',list:'listBy',matrix:'matrixBy'}[view];
+    const gList=view==='matrix'?['theme','app']:view==='board'?['stage','theme','app']:['theme','app','stage'];
+    const groupOpts=gKey?gList.map(v=>({label:LBL[v],set:()=>this.setState({[gKey]:v}),style:segStyle(st[gKey]===v)})):[];
+    const other=(by,e)=>by==='stage'?e.app+' · '+e.theme:by==='theme'?e.app+' · '+STAGES[e.stage]:e.theme+' · '+STAGES[e.stage];
+    const boardGroups=this.groups(st.boardBy,eps).map(g=>({...g,items:g.items.map(e=>({...e,cat:other(st.boardBy,e)}))}));
+    const listGroups=this.groups(st.listBy,eps).filter(g=>g.count);
+    const mb=st.matrixBy;
+    const matrixRows=keysOf(mb).map(k=>({label:k,cells:STAGES.map((s,si)=>({items:eps.filter(e=>keyOf(e,mb)===k&&e.stage===si).map(e=>({...e,mOther:(mb==='theme'?e.app:e.theme)+(e.sub?' · '+e.sub:'')}))}))}));
+    // timeline
+    const N=st.nq*3,W=st.qStart,rowH=st.details?36:24;
+    const grid={backgroundImage:'linear-gradient(to right,var(--color-neutral-200) 1px,transparent 1px)',backgroundSize:'calc(100% / '+st.nq+') 100%'};
+    const tRows=[];
+    const pushE=(list,ind)=>list.forEach(e=>tRows.push({...e,isE:true,tSub:other('stage',e)+' · '+STAGES[e.stage],
+      labelStyle:{height:rowH+'px',boxSizing:'border-box',padding:'0 10px 0 '+(12+ind*14)+'px',display:'flex',flexDirection:'column',justifyContent:'center',minWidth:0,borderBottom:'1px solid var(--color-neutral-200)'},
+      cellStyle:{position:'relative',height:rowH+'px',borderBottom:'1px solid var(--color-neutral-200)',...grid},
+      bar:this.bar(e,W,N,rowH)}));
+    if(st.g1==='none')pushE(eps,0);
+    else keysOf(st.g1).forEach(k=>{const a=eps.filter(e=>keyOf(e,st.g1)===k);if(!a.length)return;tRows.push({isG1:true,label:k,count:a.length});
+      if(st.g2==='none'||st.g2===st.g1)pushE(a,1);
+      else keysOf(st.g2).forEach(k2=>{const b=a.filter(e=>keyOf(e,st.g2)===k2);if(!b.length)return;tRows.push({isG2:true,label:k2,count:b.length});pushE(b,2);});});
+    const quarters=Array.from({length:st.nq},(_,i)=>{const m=W+i*3,y=Math.floor(m/12),q=Math.floor((m%12)/3);return {label:'Q'+(q+1)+' '+(st.nq>8?'’'+String(y).slice(2):y),months:st.nq<=8?MON.slice(q*3,q*3+3):[]};});
+    const tp=(TODAY-W)/N*100;
+    // modal
+    const d=st.draft;
+    const on={};['title','desc','app','theme','sub'].forEach(k=>on[k]=ev=>this.setD(k,ev.target.value));
+    on.stage=ev=>{const v=Number(ev.target.value);this.setState(s=>({draft:{...s.draft,stage:v,sub:v===3?s.draft.sub:''}}));};
+    const dSlipM=d&&d.pe&&d.fe?abs(d.fe)-abs(d.pe):0;
+    return {
+      tabs,isBoard:view==='board',isList:view==='list',isMatrix:view==='matrix',isTimeline:view==='timeline',
+      showGroupSeg:!!gKey,groupOpts,boardGroups,listGroups,matrixRows,stageCols:STAGES,
+      legend:Object.keys(HEALTH).filter(h=>h!=='Done').map(h=>({label:h,dot:dot(h)})).concat([{label:'Done',dot:{...dot('Done'),background:'white'}}]),
+      g1:st.g1,g2:st.g2,
+      g1Opts:['app','theme','stage','none'].map(v=>({v,label:LBL[v]})),
+      g2Opts:['none','theme','app','stage'].filter(v=>v==='none'||v!==st.g1).map(v=>({v,label:LBL[v]})),
+      setG1:ev=>{const v=ev.target.value;this.setState(s=>({g1:v,g2:s.g2===v||v==='none'?'none':s.g2}));},
+      setG2:ev=>this.setState({g2:ev.target.value}),
+      qOpts:[4,6,8,12].map(n=>({label:String(n),set:()=>this.setState({nq:n}),style:segStyle(st.nq===n)})),
+      shiftBack:()=>this.setState(s=>({qStart:s.qStart-3})),shiftFwd:()=>this.setState(s=>({qStart:s.qStart+3})),goToday:()=>this.setState({qStart:Math.floor(TODAY/3)*3-3}),
+      details:st.details,toggleDetails:()=>this.setState(s=>({details:!s.details})),
+      quarters,qHeadStyle:{display:'grid',gridTemplateColumns:'repeat('+st.nq+',minmax(0,1fr))',background:'var(--color-neutral-100)',borderBottom:'1px solid var(--color-divider)'},
+      tRows,showToday:tp>=0&&tp<=100,todayStyle:{position:'absolute',top:0,bottom:0,left:tp+'%',width:'2px',background:'var(--color-accent-700)'},
+      newEpic:()=>this.open({id:'e'+Date.now(),title:'',desc:'',app:APPS[0],theme:THEMES[0],stage:0,sub:'',health:'On track',ps:'',pe:'',fs:'',fe:'',as:'',ae:'',updates:[]}),
+      modalOpen:!!d,closeModal:()=>this.close(),stop:ev=>ev.stopPropagation(),save:()=>this.save(),
+      d:d||{},on,appList:APPS,themeList:THEMES,
+      stageOpts:STAGES.map((s,i)=>({v:i,label:s})),
+      subOpts:[{v:'',label:'—'}].concat(SUBS.map(s=>({v:s,label:s}))),subDisabled:!d||d.stage!==3,
+      healthBtns:Object.keys(HEALTH).map(h=>{const sel=d&&d.health===h;return {label:h,done:h==='Done',set:()=>this.setD('health',h),style:{display:'inline-flex',alignItems:'center',gap:'4px',height:'28px',padding:'0 12px',borderRadius:'14px',cursor:'pointer',fontSize:'12.5px',fontWeight:600,border:'1px solid '+(sel?HEALTH[h].bd:'var(--color-neutral-300)'),background:sel?HEALTH[h].bg:'white',color:sel?HEALTH[h].fg:'var(--color-neutral-700)'}};}),
+      dateRows:d?[['Planned','ps','pe'],['Forecast','fs','fe'],['Actual','as','ae']].map(([label,a,b])=>({label,s:d[a]||'',e:d[b]||'',onS:ev=>this.setD(a,ev.target.value),onE:ev=>this.setD(b,ev.target.value)})):[],
+      dSlip:dSlipM>0,dSlipTxt:'Forecast end is '+dSlipM+' month'+(dSlipM>1?'s':'')+' later than planned',
+      newUpd:st.newUpd,setNewUpd:ev=>this.setState({newUpd:ev.target.value}),noUpd:!st.newUpd.trim(),addUpdate:()=>this.addUpdate(),
+      dUpdates:d?d.updates.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(u=>({...u,when:fday(u.date),initials:u.author.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()})):[],
+      noUpdates:!!d&&!d.updates.length
+    };
+  }
+}
+</script>
+</body>
+</html>
