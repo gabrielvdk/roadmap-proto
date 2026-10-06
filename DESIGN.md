@@ -16,9 +16,9 @@ When you change a token or recipe, update this file in **both** repos.
 | Titles (corporate identity) | **Titillium Web** | 600 / 700 | see below |
 
 **Titillium Web is for titles only:**
-- app name in the top bar (17-18px, 700)
+- app name in the top bar (18px, 700)
 - view or page heading (`h1`, 22px, 700)
-- modal title (20-22px, 700)
+- modal title (20px, 700)
 
 Column, group, table and section headers stay in Figtree (700) so dense views stay compact.
 
@@ -36,8 +36,9 @@ Column, group, table and section headers stay in Figtree (700) so dense views st
 
 | Size | Use |
 |---|---|
-| 22px / 700 | view heading |
-| 17px / 700 | modal header (EOS), app name |
+| 22px / 700 | view heading (Titillium) |
+| 20px / 700 | modal title (Titillium) |
+| 18px / 700 | app name (Titillium) |
 | 14px | body, buttons, inputs |
 | 13.5px | menu items, card titles, history text |
 | 13px | table headers (700), small buttons, secondary cells |
@@ -75,8 +76,9 @@ Define these on `:root` and use them everywhere. Never hard-code colors in compo
 | `--red-soft` | `#FBE4E7` | `#3F1F26` | red tint |
 | `--grey-pill` | `#C7CDD7` | `#3A4556` | not set, empty progress |
 | `--grey-fill` | `#8A95A6` | `#7D8898` | neutral markers |
+| `--done` | `#0A5A42` | `#1E8A66` | finished work (darker than `--green-deep`, always with a ✓) |
 
-**Dark mode** follows the OS, with an explicit override:
+**Dark mode** follows the OS, with an explicit override. A small round toggle fixed at the bottom right switches light/dark; it sets `data-theme` on `<html>` and remembers the choice per browser (`localStorage`, one key per app, applied in `<head>` to avoid a flash).
 
 ```css
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ /* dark values */ } }
@@ -98,8 +100,9 @@ The same color means the same thing in both apps.
 | Warning | — | At risk | `--amber` | `--amber-soft` / amber→ink |
 | Bad | Off-Track | Late | `--red` | `--red-soft` / red→ink |
 | Escalated | OT - Escalate | — | `--red-deep` | — |
-| Finished | Done | Done | `--green-deep` (+ ✓ icon) | green-deep tint |
-| Stopped | Cancelled | (future: Closed/Stopped) | grey hatch, strike-through | — |
+| Finished | Done | Done (stage) | `--green-deep` in EOS; `--done` in Roadmapper bars (+ ✓ icon) | done tint |
+| Stopped | Cancelled | — | grey hatch, strike-through | — |
+| Not started | — | Backlog (stage) | `--grey-fill` | `--canvas` / `--ink-2` |
 
 - **Solid fill with white text** is for an interactive status control (EOS status button).
 - **Soft pill** (tint background, darker text) is for read-only display (Roadmapper badges, lists).
@@ -108,7 +111,7 @@ The same color means the same thing in both apps.
 
 These carry identity, not status, so each app has its own set:
 - **EOSTracker levels:** Company `#5B4BDB`, Department `#1F8FD1`, Team `#19A974`, Forum `#E2741C`.
-- **Roadmapper stages** (from the product pipeline slide): Validation `#6A3D9A`, Prototyping `#3F9B5B`, Development `#1F58A3`, Productization `#E3A310`, Launch `#C8326E`, Learn `#159FA6`.
+- **Roadmapper stages** (from the product pipeline slide): Backlog `--grey-fill`, Validation `#6A3D9A`, Prototyping `#3F9B5B`, Development `#1F58A3`, Productization `#E3A310`, Launch `#C8326E`, Learn `#159FA6`, Done `--done`. Backlog and Done sit outside the pipeline and are hidden by default in views not grouped by stage.
 
 Show categories as a dot (8px circle), a 3px top border on a column, or a tint (`color-mix` 9-14% with `--surface`). Never use them as large solid fills.
 

@@ -31,8 +31,10 @@ The server sends `no-store`, so a reload shows the latest edit. Sometimes the po
   - `state` holds data and UI state.
   - `renderVals()` computes everything the template needs.
   - Change data with `persist()` / `patch(id, p, via)` / `save()`.
-- **Storage:** `localStorage` key `lg-roadmap-v4.1` (per browser, not shared). Bump the key when the data shape changes or the seed must reload for everyone. Clear it in the browser pane to see the seed again.
-- **Fixed lists:** `APPS`, `THEMES`, `STAGES` (6 stages), `HEALTH` (On track / At risk / Late / Done).
+- **Storage:** `localStorage` key `lg-roadmap-v4.2` (per browser, not shared). Bump the key when the data shape changes or the seed must reload for everyone. Clear it in the browser pane to see the seed again.
+- **Fixed lists:** `APPS`, `THEMES`, `STAGES` (8: **Backlog**, the 6 pipeline stages, **Done**; `BACKLOG`/`DONE` constants), `HEALTH` (On track / At risk / Late; applies to active work only).
+- **Status shown** (`statusOf`, `STATUS`): stage Done → "Done" (dark green `--done` + ✓), stage Backlog → "Backlog" (grey), otherwise the health. The Health buttons are hidden in the modal for Backlog/Done.
+- **Parked Epics** (`isParked`: Backlog or Done) are hidden by default in every view not grouped by stage (Board/List by Theme or App, Matrix, Timeline unless grouped by Stage). A line under the content ("Backlog (2) and Done (1) hidden · Show") toggles `showParked`, shared across views.
 - **Seed:** the `SEED` array. Epic ids `e1…` come from row order, so if you remove rows, remap `SEED_AUDIT`.
 - **Epic fields:**
   - `title`, `desc`, `app`, `theme`, `stage` (index)
@@ -52,9 +54,10 @@ The server sends `no-store`, so a reload shows the latest edit. Sometimes the po
   - colored bar = actual dates where known, otherwise forecast (falling back to plan), in the health color
   - grey line underneath = original plan; "+N mo" = slip past the planned end
   - black ticks = actual start and end
-  - drag rules: not started = move or resize; started = only the end is draggable; finished = not draggable
+  - drag rules: not started = move or resize; started = only the end is draggable; finished (actual end or Done stage) = not draggable
+  - Done Epics: dark green bar with a white ✓ at its end
   - every drag asks for confirmation and is audited
-- **Stage colors** (`STAGE_C`, from the pipeline slide): used for column top borders and tints, dots and chips. Status uses the EOS colors (see `DESIGN.md` §2.1).
+- **Stage colors** (`STAGE_C`, from the pipeline slide; Backlog `--grey-fill`, Done `--done`): used for column top borders and tints, dots and chips. Status uses the EOS colors (see `DESIGN.md` §2.1).
 
 ## Conventions
 - **Use tokens only** (`--canvas`, `--surface`, `--line`, `--ink…`, `--accent…`, status colors). Never hard-code `white` or hex colors; check light **and** dark mode.
@@ -63,6 +66,8 @@ The server sends `no-store`, so a reload shows the latest edit. Sometimes the po
 - Grid columns that contain form controls need `minmax(0,1fr)`, and the controls need `width:100%;min-width:0`, or they overflow at narrow widths.
 - Never use `window.confirm()`, `alert()` or `prompt()`; they're blocked in the browser pane. Use an in-app dialog (see the forecast confirm dialog).
 - Keep the user's earlier UX decisions:
+  - List: a "Details" checkbox hides Application/Theme/Stage lines; it shares `details` with the Timeline toggle
+  - light/dark toggle: round button fixed bottom right, cloned from EOSTracker; key `lg-roadmap-theme`, applied in `<head>` before first paint
   - no stage numbers or subtitles
   - no Productization track
   - the List hides the attribute it's grouped by
@@ -70,9 +75,5 @@ The server sends `no-store`, so a reload shows the latest edit. Sometimes the po
   - double-click a List row to open it
 
 ## Open ideas / next steps
-- **Finished Epics:** the proposal (not built yet) is an Open/Closed state separate from stage, instead of a "Complete" stage.
-  - Close with an outcome (Completed / Stopped / Superseded), a closing note, and the stage it ended in.
-  - Remove "Done" from health.
-  - A "Show closed (n)" toggle, hidden by default.
-  - "Create follow-up Epic" for Expand/Fix outcomes.
+- **Finished Epics:** built as the **Done** stage (with Backlog as the counterpart before the pipeline). Possible next step: a close outcome (Completed / Stopped / Superseded) and "Create follow-up Epic" for Expand/Fix outcomes from Learn.
 - **Later, a real app:** shared backend, users and authentication, server-side audit, and admin-editable lists. Keep that in mind, but don't over-engineer the prototype.
