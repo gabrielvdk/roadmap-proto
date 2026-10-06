@@ -111,7 +111,7 @@ The same color means the same thing in both apps.
 
 These carry identity, not status, so each app has its own set:
 - **EOSTracker levels:** Company `#5B4BDB`, Department `#1F8FD1`, Team `#19A974`, Forum `#E2741C`.
-- **Roadmapper stages** (from the product pipeline slide): Backlog `--grey-fill`, Validation `#6A3D9A`, Prototyping `#3F9B5B`, Development `#1F58A3`, Productization `#E3A310`, Launch `#C8326E`, Learn `#159FA6`, Done `--done`. Backlog and Done sit outside the pipeline and are hidden by default in views not grouped by stage.
+- **Roadmapper stages** (from the product pipeline slide): Backlog `--grey-fill`, Validation `#6A3D9A`, Prototyping `#3F9B5B`, Development `#1F58A3`, Productization `#E3A310`, Launch `#C8326E`, Learn `#159FA6`, Done `--done`. Backlog and Done sit outside the pipeline; the default stage filter leaves them out.
 
 Show categories as a dot (8px circle), a 3px top border on a column, or a tint (`color-mix` 9-14% with `--surface`). Never use them as large solid fills.
 

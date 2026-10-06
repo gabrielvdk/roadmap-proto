@@ -34,7 +34,7 @@ The server sends `no-store`, so a reload shows the latest edit. Sometimes the po
 - **Storage:** `localStorage` key `lg-roadmap-v4.2` (per browser, not shared). Bump the key when the data shape changes or the seed must reload for everyone. Clear it in the browser pane to see the seed again.
 - **Fixed lists:** `APPS`, `THEMES`, `STAGES` (8: **Backlog**, the 6 pipeline stages, **Done**; `BACKLOG`/`DONE` constants), `HEALTH` (On track / At risk / Late; applies to active work only).
 - **Status shown** (`statusOf`, `STATUS`): stage Done → "Done" (dark green `--done` + ✓), stage Backlog → "Backlog" (grey), otherwise the health. The Health buttons are hidden in the modal for Backlog/Done.
-- **Parked Epics** (`isParked`: Backlog or Done) are hidden by default in every view not grouped by stage (Board/List by Theme or App, Matrix, Timeline unless grouped by Stage). A line under the content ("Backlog (2) and Done (1) hidden · Show") toggles `showParked`, shared across views.
+- **Filter** (Filter menu: Application, Theme, Stage; `fApps`, `fThemes`, `fStages`) is one shared state, so it is the same in every view. Empty list = all. The default stage filter is the 6 pipeline stages (`DEFAULT_STAGES`), so **Backlog and Done are hidden until ticked**, also on a Board grouped by Stage; "Clear filters" returns to that default. Groups, Matrix rows and Matrix/Board columns for filtered-out values are hidden (`keysIn`), not shown empty.
 - **Seed:** the `SEED` array. Epic ids `e1…` come from row order, so if you remove rows, remap `SEED_AUDIT`.
 - **Epic fields:**
   - `title`, `desc`, `app`, `theme`, `stage` (index)

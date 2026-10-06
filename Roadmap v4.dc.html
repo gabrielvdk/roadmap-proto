@@ -92,11 +92,13 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);background:var(--surface);cursor:pointer" style-hover="background:var(--color-accent-100)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>Filter<sc-if value="{{ fCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;border-radius:9px;background:var(--color-accent-700);color:white;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 5px">{{ fCount }}</span></sc-if></button>
 <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
 <div onClick="{{ toggleFilter }}" style="position:fixed;inset:0;z-index:20"></div>
-<div style="position:absolute;right:0;top:calc(100% + 6px);z-index:21;width:440px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+<div style="position:absolute;right:0;top:calc(100% + 6px);z-index:21;width:min(640px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 16px">
 <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding-bottom:4px">Application</span>
 <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding-bottom:4px">Theme</span>
+<span style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding-bottom:4px">Stage<button onClick="{{ stagesAll }}" style="border:0;background:transparent;color:var(--accent);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;cursor:pointer;padding:0 2px">All stages</button></span>
 <div style="display:flex;flex-direction:column"><sc-for list="{{ fAppOpts }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:5px 4px;border-radius:var(--radius-md);cursor:pointer;text-align:left;font-size:13.5px" style-hover="background:var(--color-neutral-100)"><span style="{{ o.box }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>{{ o.label }}</button></sc-for></div>
 <div style="display:flex;flex-direction:column"><sc-for list="{{ fThemeOpts }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:5px 4px;border-radius:var(--radius-md);cursor:pointer;text-align:left;font-size:13.5px" style-hover="background:var(--color-neutral-100)"><span style="{{ o.box }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>{{ o.label }}</button></sc-for></div>
+<div style="display:flex;flex-direction:column"><sc-for list="{{ fStageOpts }}" as="o" hint-placeholder-count="8"><button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:5px 4px;border-radius:var(--radius-md);cursor:pointer;text-align:left;font-size:13.5px" style-hover="background:var(--color-neutral-100)"><span style="{{ o.box }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span><span style="{{ o.dot }}"></span>{{ o.label }}</button></sc-for></div>
 <div style="grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--color-divider);margin-top:8px;padding-top:10px;font-size:12.5px;color:var(--color-neutral-700)"><span>{{ fSummary }}</span><button onClick="{{ clearFilters }}" style="border:0;background:transparent;color:var(--color-accent-700);font-weight:600;cursor:pointer;padding:4px 6px;border-radius:var(--radius-md)" style-hover="background:var(--color-accent-100)">Clear filters</button></div>
 </div>
 </sc-if>
@@ -224,9 +226,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 <span style="margin-left:auto;color:var(--color-neutral-700)">Bar = actual dates where known, otherwise forecast. Drag a bar or its open end to change the forecast.</span>
 </div>
 </sc-if>
-<sc-if value="{{ parkedShow }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;align-items:center;gap:8px;padding:14px 2px 0;font-size:12.5px;color:var(--ink-3)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"></path></svg><span>{{ parkedTxt }}</span><button onClick="{{ toggleParked }}" style="border:0;background:transparent;color:var(--accent);font-weight:600;cursor:pointer;padding:3px 6px;border-radius:6px;font-size:12.5px" style-hover="background:var(--accent-soft)">{{ parkedBtn }}</button></div>
-</sc-if>
 
 </div>
 <button onClick="{{ toggleTheme }}" type="button" title="{{ themeTxt }}" aria-label="{{ themeAria }}" style="position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:12;width:38px;height:38px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(28,36,48,.10);padding:0;cursor:pointer" style-hover="color:var(--accent);border-color:var(--accent)"><sc-if value="{{ isDarkTheme }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="10" cy="10" r="3.6"></circle><path d="M10 1.8v2M10 16.2v2M1.8 10h2M16.2 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"></path></svg></sc-if><sc-if value="{{ isLightTheme }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"><path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a7 7 0 1 0 8.8 8.8z"></path></svg></sc-if></button>
@@ -340,8 +339,8 @@ const THEMES=['Energy Management','IPM','Yield Prediction','Cultivation'];
 const APPS=['IIVO','Intelligent Algorithms','LetsGrow.com','Intelligent Assistance'];
 const STAGES=['Backlog','Validation','Prototyping','Development','Productization','Launch','Learn','Done'];
 const BACKLOG=0,DONE=STAGES.length-1;
-// Backlog and Done sit outside the pipeline: hidden by default in views not grouped by stage.
-const isParked=e=>e.stage===BACKLOG||e.stage===DONE;
+// Backlog and Done sit outside the pipeline: the default stage filter leaves them out.
+const DEFAULT_STAGES=STAGES.map((s,i)=>i).filter(i=>i!==BACKLOG&&i!==DONE);
 // Stage colors taken from the product pipeline slide; Backlog is neutral, Done uses the finished green.
 const STAGE_C=['var(--grey-fill)','#6a3d9a','#3f9b5b','#1f58a3','#e3a310','#c8326e','#159fa6','var(--done)'];
 const stTint=(i,p)=>'color-mix(in srgb, '+STAGE_C[i]+' '+p+'%, var(--surface))';
@@ -441,8 +440,8 @@ function shiftF(e,mode,dm){
 }
 
 class Component extends DCLogic {
-  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'theme',g1:'app',g2:'theme',nq:6,details:true,fApps:[],fThemes:[],filterOpen:false,
-    draft:null,newUpd:'',picker:null,dragId:null,overKey:null,cw:0,tdrag:null,confirm:null,showParked:false,theme:readTheme()};
+  state={epics:load(),view:'board',boardBy:'stage',listBy:'theme',matrixBy:'theme',g1:'app',g2:'theme',nq:6,details:true,fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
+    draft:null,newUpd:'',picker:null,dragId:null,overKey:null,cw:0,tdrag:null,confirm:null,theme:readTheme()};
   // Light/dark: follows the OS until the user picks one with the toggle; the choice is remembered per browser.
   effTheme(){return this.state.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
   toggleTheme(){const t=this.effTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem(THEME_KEY,t);}catch(e){}this.setState({theme:t});}
@@ -496,7 +495,7 @@ class Component extends DCLogic {
       last:l?{text:l.text,when:rel(l.date),full:fullDT(l.date),author:l.author}:null,
       open:()=>this.open(e),...this.dragProps(e)};
   }
-  groups(by,eps){return keysOf(by).map(k=>{const items=eps.filter(e=>keyOf(e,by)===k);return {label:k,count:items.length,items};});}
+  groups(by,eps,keys){return (keys||keysOf(by)).map(k=>{const items=eps.filter(e=>keyOf(e,by)===k);return {label:k,count:items.length,items};});}
   bar(e,R0,mw,rowH){
     const t=this.state.tdrag;if(t&&t.id===e.id)e={...e,...shiftF(e,t.mode,t.dm)};
     // Bar = actual dates where known, otherwise forecast (falling back to plan). Plan is a grey baseline underneath.
@@ -538,31 +537,31 @@ class Component extends DCLogic {
   renderVals(){
     const st=this.state;
     const all=st.epics.map(e=>this.deco(e)).sort((a,b)=>(a.fs||a.ps||'').localeCompare(b.fs||b.ps||''));
-    const eps=all.filter(e=>(!st.fApps.length||st.fApps.includes(e.app))&&(!st.fThemes.length||st.fThemes.includes(e.theme)));
-    const view=st.view;
-    // Backlog and Done are parked: hidden unless the view is grouped by stage or the user chose to show them.
-    const hideFor=v=>v==='board'?st.boardBy!=='stage':v==='list'?st.listBy!=='stage':v==='matrix'?true:(st.g1!=='stage'&&st.g2!=='stage');
-    const visFor=v=>hideFor(v)&&!st.showParked?eps.filter(e=>!isParked(e)):eps;
-    const vis=visFor(view);
-    const nBacklog=eps.filter(e=>e.stage===BACKLOG).length,nDone=eps.filter(e=>e.stage===DONE).length;
-    const mStages=STAGES.map((s,i)=>i).filter(i=>st.showParked||(i!==BACKLOG&&i!==DONE));
+    // One filter for all views (application, theme, stage); an empty list means "all".
+    const inApp=a=>!st.fApps.length||st.fApps.includes(a),inTheme=t=>!st.fThemes.length||st.fThemes.includes(t),inStage=i=>!st.fStages.length||st.fStages.includes(i);
+    const eps=all.filter(e=>inApp(e.app)&&inTheme(e.theme)&&inStage(e.stage));
+    const view=st.view,vis=eps;
+    // Groups, rows and columns only for the values the filter lets through.
+    const keysIn=by=>by==='theme'?THEMES.filter(inTheme):by==='app'?APPS.filter(inApp):STAGES.filter((s,i)=>inStage(i));
+    const mStages=STAGES.map((s,i)=>i).filter(inStage);
+    const stagesDefault=st.fStages.length===DEFAULT_STAGES.length&&DEFAULT_STAGES.every(i=>st.fStages.includes(i));
     const tabs=[['board','Board'],['list','List'],['matrix','Matrix'],['timeline','Timeline']].map(([v,label])=>({label,set:()=>this.setState({view:v}),style:{border:0,padding:'7px 14px',borderRadius:'9px',cursor:'pointer',fontSize:'14px',fontWeight:600,background:view===v?'var(--surface)':'transparent',color:view===v?'var(--ink)':'var(--ink-2)',boxShadow:view===v?'0 1px 3px rgba(28,36,48,.12)':'none'}}));
     const viewTitle={board:'Board',list:'List',matrix:'Matrix',timeline:'Timeline'}[view];
     const gKey={board:'boardBy',list:'listBy',matrix:'matrixBy'}[view];
     const gList=view==='matrix'?['theme','app']:view==='board'?['stage','theme','app']:['theme','app','stage'];
     const groupOpts=gKey?gList.map(v=>({label:LBL[v],set:()=>this.setState({[gKey]:v}),style:segStyle(st[gKey]===v)})):[];
     const tog=(k,v)=>()=>this.setState(s=>({[k]:s[k].includes(v)?s[k].filter(x=>x!==v):[...s[k],v]}));
-    const fCount=st.fApps.length+st.fThemes.length;
+    const fCount=st.fApps.length+st.fThemes.length+(stagesDefault?0:1);
     const other=(by,e)=>by==='stage'?e.app+' · '+e.theme:by==='theme'?e.app+' · '+STAGES[e.stage]:e.theme+' · '+STAGES[e.stage];
     const bb=st.boardBy;
-    const boardGroups=this.groups(bb,visFor('board')).map(g=>{const z=this.dropZone('b:'+g.label,patchFor(bb,g.label),'Board');const si=bb==='stage'?STAGES.indexOf(g.label):-1;
+    const boardGroups=this.groups(bb,eps,keysIn(bb)).map(g=>{const z=this.dropZone('b:'+g.label,patchFor(bb,g.label),'Board');const si=bb==='stage'?STAGES.indexOf(g.label):-1;
       return {...g,over:z.over,drop:z.drop,bg:z.active?'var(--color-accent-200)':si>=0?stTint(si,9):'var(--color-neutral-200)',ol:z.active?'2px dashed var(--color-accent-500)':'none',
         top:si>=0?'3px solid '+STAGE_C[si]:'3px solid transparent',hc:si>=0?'color-mix(in srgb, '+STAGE_C[si]+' 70%, var(--ink))':'var(--color-text)'};});
     const lb=st.listBy;
-    const listGroups=this.groups(lb,visFor('list')).filter(g=>g.count).map(g=>{const si=lb==='stage'?STAGES.indexOf(g.label):-1;return {...g,hc:si>=0?'color-mix(in srgb, '+STAGE_C[si]+' 70%, var(--ink))':'var(--color-text)',bl:si>=0?'4px solid '+STAGE_C[si]:'4px solid transparent',hbg:si>=0?stTint(si,14):'var(--surface)',countTxt:g.count+(g.count===1?' epic':' epics')};});
+    const listGroups=this.groups(lb,eps,keysIn(lb)).filter(g=>g.count).map(g=>{const si=lb==='stage'?STAGES.indexOf(g.label):-1;return {...g,hc:si>=0?'color-mix(in srgb, '+STAGE_C[si]+' 70%, var(--ink))':'var(--color-text)',bl:si>=0?'4px solid '+STAGE_C[si]:'4px solid transparent',hbg:si>=0?stTint(si,14):'var(--surface)',countTxt:g.count+(g.count===1?' epic':' epics')};});
     const mb=st.matrixBy;
-    const mEps=visFor('matrix');
-    const matrixRows=keysOf(mb).map(k=>({label:k,cells:mStages.map(si=>{const z=this.dropZone('m:'+k+':'+si,{...patchFor(mb,k),stage:si},'Matrix');return {over:z.over,drop:z.drop,bg:z.active?'var(--color-accent-100)':stTint(si,4),
+    const mEps=eps;
+    const matrixRows=keysIn(mb).map(k=>({label:k,cells:mStages.map(si=>{const z=this.dropZone('m:'+k+':'+si,{...patchFor(mb,k),stage:si},'Matrix');return {over:z.over,drop:z.drop,bg:z.active?'var(--color-accent-100)':stTint(si,4),
       items:mEps.filter(e=>keyOf(e,mb)===k&&e.stage===si).map(e=>({...e,mOther:mb==='theme'?e.app:e.theme}))};})}));
     // timeline
     const starts=all.map(e=>abs(e.as||e.fs||e.ps)).filter(v=>v!=null),ends=all.map(e=>abs(e.ae||e.fe||e.pe)).filter(v=>v!=null);
@@ -580,7 +579,7 @@ class Component extends DCLogic {
       hasBar:!!bar,bar:bar||{},canStart:!e.as&&!e.ae&&!e.done,canEnd:!e.ae&&!e.done,barTip:e.title+' · '+e.forecastTxt,
       downMove:this.barDown(e,e.as||e.ae||e.done?'none':'move'),downStart:this.barDown(e,'start'),downEnd:this.barDown(e,'end')});});
     const gDot=(by,k)=>by==='stage'?{...stDot(STAGES.indexOf(k))}:{display:'none'};
-    const tEps=visFor('timeline');
+    const tEps=eps;
     if(st.g1==='none')pushE(tEps,0);
     else keysOf(st.g1).forEach(k=>{const a=tEps.filter(e=>keyOf(e,st.g1)===k);if(!a.length)return;tRows.push({isG1:true,label:k,count:a.length,gd:gDot(st.g1,k)});
       if(st.g2==='none'||st.g2===st.g1)pushE(a,1);
@@ -601,12 +600,12 @@ class Component extends DCLogic {
       filterOpen:st.filterOpen,toggleFilter:()=>this.setState(s=>({filterOpen:!s.filterOpen})),fCount,
       fAppOpts:APPS.map(a=>({label:a,on:st.fApps.includes(a),box:cbox(st.fApps.includes(a)),toggle:tog('fApps',a)})),
       fThemeOpts:THEMES.map(a=>({label:a,on:st.fThemes.includes(a),box:cbox(st.fThemes.includes(a)),toggle:tog('fThemes',a)})),
-      fSummary:'Showing '+eps.length+' of '+all.length+' epics',clearFilters:()=>this.setState({fApps:[],fThemes:[]}),
+      fStageOpts:STAGES.map((s,i)=>({label:s,on:st.fStages.includes(i),box:cbox(st.fStages.includes(i)),dot:stDot(i),toggle:()=>this.setState(x=>({fStages:x.fStages.includes(i)?x.fStages.filter(v=>v!==i):[...x.fStages,i].sort((a,b)=>a-b)}))})),
+      stagesAll:()=>this.setState({fStages:STAGES.map((s,i)=>i)}),
+      fSummary:'Showing '+eps.length+' of '+all.length+' epics'+(stagesDefault?' · Backlog and Done hidden':''),clearFilters:()=>this.setState({fApps:[],fThemes:[],fStages:DEFAULT_STAGES}),
       boardGroups,showCardApp:bb!=='app',showCardStage:bb!=='stage',dragEnd:()=>this.setState({dragId:null,overKey:null}),
       listGroups,showListStage:lb!=='stage'&&st.details,showListApp:lb!=='app'&&st.details,showListTheme:lb!=='theme'&&st.details,matrixRows,
       mGrid:{display:'grid',gridTemplateColumns:'150px repeat('+mStages.length+',minmax(150px,1fr))',minWidth:(150+mStages.length*150)+'px'},
-      parkedShow:hideFor(view)&&(nBacklog+nDone)>0,parkedOn:!!st.showParked,toggleParked:()=>this.setState(s=>({showParked:!s.showParked})),
-      parkedTxt:(st.showParked?'Showing ':'')+[nBacklog?'Backlog ('+nBacklog+')':'',nDone?'Done ('+nDone+')':''].filter(Boolean).join(' and ')+(st.showParked?'':' hidden'),parkedBtn:st.showParked?'Hide':'Show',
       themeTxt:this.effTheme()==='dark'?'Light mode':'Dark mode',themeAria:this.effTheme()==='dark'?'Switch to light mode':'Switch to dark mode',isDarkTheme:this.effTheme()==='dark',isLightTheme:this.effTheme()!=='dark',toggleTheme:()=>this.toggleTheme(),
       stageCols:mStages.map(i=>({label:STAGES[i],style:{padding:'8px 10px',fontWeight:700,fontSize:'13.5px',background:stTint(i,12),color:'color-mix(in srgb, '+STAGE_C[i]+' 70%, var(--ink))',borderTop:'3px solid '+STAGE_C[i],borderBottom:'1px solid var(--color-divider)',borderLeft:'1px solid var(--color-divider)'}})),
       detailsTab:mtab(true),
