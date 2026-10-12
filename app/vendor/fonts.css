@@ -1,0 +1,4 @@
+/* Self-hosted Google Fonts (latin subset), so the app makes no third-party requests. Licenses: fonts/OFL-*.txt */
+@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/figtree-latin.woff2) format('woff2')}
+@font-face{font-family:'Titillium Web';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/titillium-web-600-latin.woff2) format('woff2')}
+@font-face{font-family:'Titillium Web';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/titillium-web-700-latin.woff2) format('woff2')}

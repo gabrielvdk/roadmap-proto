@@ -13,6 +13,8 @@ Clicking an Epic title, or a card or bar, in any view opens the **Epic modal**. 
 The target feel is an **office application** in the style of Microsoft Planner or Trello: white cards, soft shadows, rounded corners and a dense, practical layout. It should **not** look like a wireframe.
 
 ## About the design files
+> **Note:** this handoff was written for v3. The current prototype is `app/index.html` (v4); see `CLAUDE.md` for how it's built and `SECURITY.md` for its architecture and hosting. v2/v3 are in git history (tag `v3-reference`).
+
 `Roadmap v3.dc.html` is a **design reference built in HTML**: a working prototype that shows the intended look and behavior. It is not production code to copy. Rebuild it in the target codebase with that codebase's framework and patterns. If no codebase exists yet, pick a suitable stack; a React + TypeScript SPA with a small REST/DB backend is a sensible default.
 
 The prototype file uses a custom template runtime (`support.js`, the `<sc-for>` / `<sc-if>` / `{{ }}` syntax), and all styles are inline. Read the template part for markup and styles. The `<script data-dc-script>` block at the bottom holds all logic and sample data, written as plain JS.
@@ -208,8 +210,6 @@ The base is the **Industry** design system tokens (`styles.css` is included). On
 - Admin-editable lists of Applications, Themes and Stages.
 
 ## Files
-- `Roadmap v3.dc.html`: the current prototype and source of truth for behavior. Open it in a browser next to `support.js` and `_ds/`.
-- `support.js`: the prototype runtime (reference only).
-- `_ds/.../styles.css`: design tokens.
-- `Roadmap v2.dc.html`: the previous iteration (reference only).
+- `app/`: the current prototype (v4) and everything it needs at runtime; see `CLAUDE.md`.
+- `Roadmap v3.dc.html`, `Roadmap v2.dc.html`, `_ds/`: earlier iterations, removed from the tree; available at git tag `v3-reference`.
 - `CONVERSATION_CONTEXT.md`: the decisions and feedback history.
