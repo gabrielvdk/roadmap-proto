@@ -22,6 +22,8 @@ When you change a token or recipe, update this file in **both** repos.
 
 Column, group, table and section headers stay in Figtree (700) so dense views stay compact.
 
+Roadmapper self-hosts both fonts (`app/vendor/fonts.css`) so it makes no third-party requests. Elsewhere, the Google Fonts link is:
+
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Titillium+Web:wght@600;700&display=swap" rel="stylesheet">
@@ -66,6 +68,10 @@ Define these on `:root` and use them everywhere. Never hard-code colors in compo
 | `--ink-3` | `#8A95A6` | `#7D8898` | meta, placeholders, icons |
 | `--accent` | `#2F6FE4` | `#6B9BFF` | primary buttons, selection, focus, links |
 | `--accent-soft` | `#E6EEFC` | `#213353` | selected or hover tint, focus ring |
+| `--accent-fill` | `#2F6FE4` | `#2F6FE4` | solid accent fills (primary buttons, checked boxes, count badges); stays dark in dark mode so white text keeps 4.6:1 |
+| `--on-fill` | `#FFFFFF` | `#FFFFFF` | text and icons on a solid accent or status fill |
+| `--accent-tint` | accent 22% on surface | same formula | avatars, drop-target highlight |
+| `--accent-strong` | accent 80% on ink | same formula | accent text that needs more contrast (new values in history, current year) |
 | `--green` | `#19A974` | same | on track, done-ish |
 | `--green-deep` | `#0E7A5A` | same | done |
 | `--green-soft` | `#DDF5EA` | `#17382C` | green tint |
@@ -78,7 +84,7 @@ Define these on `:root` and use them everywhere. Never hard-code colors in compo
 | `--grey-fill` | `#8A95A6` | `#7D8898` | neutral markers |
 | `--done` | `#0A5A42` | `#1E8A66` | finished work (darker than `--green-deep`, always with a ✓) |
 
-**Dark mode** follows the OS, with an explicit override. A small round toggle fixed at the bottom right switches light/dark; it sets `data-theme` on `<html>` and remembers the choice per browser (`localStorage`, one key per app, applied in `<head>` to avoid a flash).
+**Dark mode** follows the OS, with an explicit override: **Light / Dark / Follow computer**, as a segmented control (`.seg`), never a floating button. Where it lives: on the profile or settings page if the app has one (EOS Tracker: Profile → Appearance), otherwise in a small footer under the page (Roadmapper: "Appearance" in the footer). It sets `data-theme` on `<html>` (removed for "Follow computer") and remembers the choice per browser (`localStorage`, one key per app, applied in `<head>` to avoid a flash).
 
 ```css
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ /* dark values */ } }

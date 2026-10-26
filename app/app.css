@@ -1,0 +1,120 @@
+/* Roadmapper styles: the EOS design tokens (DESIGN.md §2) and the UI primitives used more than once.
+   One-off layout stays inline in index.html. */
+:root{
+  --canvas:#F3F5F9;--surface:#FFFFFF;--line:#E3E7EE;--line-strong:#C9D0DB;
+  --ink:#1C2430;--ink-2:#5B6778;--ink-3:#8A95A6;
+  --accent:#2F6FE4;--accent-soft:#E6EEFC;
+  --green:#19A974;--green-deep:#0E7A5A;--green-soft:#DDF5EA;
+  --red:#D93B4F;--red-deep:#A51E35;--red-soft:#FBE4E7;
+  --amber:#E29A1C;--amber-soft:#FCF0D8;
+  --grey-pill:#C7CDD7;--grey-fill:#8A95A6;--done:#0A5A42;
+  --shadow:0 10px 30px rgba(28,36,48,.14);
+  /* Solid accent fills (primary buttons, checked boxes) keep the light accent in both themes,
+     so white text on them stays readable (4.6:1); --on-fill is text and icons on any solid fill. */
+  --accent-fill:#2F6FE4;--on-fill:#FFFFFF;
+  --font-title:"Titillium Web",Figtree,"Segoe UI",system-ui,sans-serif;
+  --font-body:Figtree,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --radius-md:9px;--radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(28,36,48,.07);--shadow-md:0 2px 8px rgba(28,36,48,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --canvas:#141922;--surface:#1C232E;--line:#2A3340;--line-strong:#3A4556;
+  --ink:#EDF1F7;--ink-2:#AEB8C8;--ink-3:#7D8898;
+  --accent:#6B9BFF;--accent-soft:#213353;
+  --green-soft:#17382C;--red-soft:#3F1F26;--amber-soft:#3E3119;
+  --grey-pill:#3A4556;--grey-fill:#7D8898;--done:#1E8A66;
+  --shadow:0 10px 30px rgba(0,0,0,.5);color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --canvas:#141922;--surface:#1C232E;--line:#2A3340;--line-strong:#3A4556;
+  --ink:#EDF1F7;--ink-2:#AEB8C8;--ink-3:#7D8898;
+  --accent:#6B9BFF;--accent-soft:#213353;
+  --green-soft:#17382C;--red-soft:#3F1F26;--amber-soft:#3E3119;
+  --grey-pill:#3A4556;--grey-fill:#7D8898;--done:#1E8A66;
+  --shadow:0 10px 30px rgba(0,0,0,.5);color-scheme:dark;
+}
+/* Derived tints, after the theme blocks so they follow the active theme. */
+:root{--accent-tint:color-mix(in srgb,var(--accent) 22%,var(--surface));--accent-strong:color-mix(in srgb,var(--accent) 80%,var(--ink))}
+
+body{margin:0;background:var(--canvas);font-family:var(--font-body);font-size:14px;line-height:1.45;color:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background-color:var(--surface)}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Buttons (DESIGN.md §5). */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 16px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);color:var(--ink);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;flex:none}
+.btn:hover{background:var(--canvas)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.sm{height:30px;padding:0 10px;font-size:13px}
+.btn.icon{width:30px;height:30px;padding:0}
+.btn.primary{border-color:var(--accent-fill);background:var(--accent-fill);color:var(--on-fill)}
+.btn.primary:hover{background:var(--accent-fill);filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--canvas);color:var(--ink)}
+.link{border:0;background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;padding:3px 6px;border-radius:var(--radius-md)}
+.link:hover{background:var(--accent-soft)}
+/* Text that opens an epic (List and Timeline titles). */
+.title-link{all:unset;cursor:pointer;font-weight:600}
+.title-link:hover{color:var(--accent);text-decoration:underline}
+.title-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* View tabs in the top bar. */
+.vtabs{display:flex;gap:4px;background:var(--canvas);padding:4px;border-radius:12px;flex:none}
+.vtab{border:0;padding:7px 14px;border-radius:var(--radius-md);cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:var(--ink-2)}
+.vtab.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(28,36,48,.12)}
+
+/* Segmented control (Group by, Quarters). */
+.seg{display:flex;border:1px solid var(--line-strong);border-radius:var(--radius-md);overflow:hidden}
+.seg button{border:0;padding:0 12px;height:30px;cursor:pointer;font-size:13px;font-weight:600;background:var(--surface);color:var(--ink-2)}
+.seg button.on{background:var(--accent-soft);color:var(--accent)}
+
+/* Form fields. */
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.ctl{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:var(--radius-md);padding:8px 10px;background:var(--surface);color:var(--ink);font-size:14px;font-weight:400;line-height:1.45;outline:none}
+select.ctl{height:34px;padding:0 8px}
+.ctl:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.toolbar-select{height:32px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);padding:0 8px;font-weight:600}
+
+/* Custom checkbox (15px box) and the menu row it sits in. */
+.chk{width:15px;height:15px;flex:none;box-sizing:border-box;border-radius:3px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--grey-fill);background:var(--surface);color:var(--on-fill)}
+.chk.on{border-color:var(--accent-fill);background:var(--accent-fill)}
+.chk svg{display:none}
+.chk.on svg{display:block}
+.opt{display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:5px 4px;border-radius:var(--radius-md);cursor:pointer;text-align:left;font-size:13.5px}
+.opt:hover{background:var(--canvas)}
+
+/* Popovers, dialogs and their backdrop. */
+.pop{background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow)}
+.scrim{position:fixed;inset:0}
+.backdrop{position:fixed;inset:0;background:rgba(14,18,26,.45);display:flex;justify-content:center;padding:20px;overflow:auto}
+.dialog{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.caption{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+
+/* Epic modal: two columns that stack on narrow screens (DESIGN.md §5, Modal). */
+.mgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.mgrid>.main{border-right:1px solid var(--line)}
+.mtabs{display:flex;padding:0 20px;border-bottom:1px solid var(--line)}
+.mtab{display:flex;align-items:center;gap:6px;border:0;background:transparent;padding:0 4px;height:46px;margin-right:20px;font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.mtab.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.mtab .n{font-weight:400;color:var(--ink-3)}
+.mbody{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px}
+@media (max-width:860px){.mgrid{grid-template-columns:minmax(0,1fr)}.mgrid>.main{border-right:0;border-bottom:1px solid var(--line)}}
+@media (max-width:640px){.cols3{grid-template-columns:minmax(0,1fr)!important}}
+
+/* Updates and history entries. */
+.entry{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
+.entry-meta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.avatar{width:22px;height:22px;flex:none;border-radius:50%;background:var(--accent-tint);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600}
+.muted{font-size:13px;color:var(--ink-2)}
+.slip{font-size:11.5px;font-weight:600;color:color-mix(in srgb,var(--red) 75%,var(--ink))}
+
+/* Month picker. */
+.pk{height:28px;border:1px solid transparent;border-radius:var(--radius-md);background:transparent;cursor:pointer;font-size:13px;color:var(--ink)}
+.pk:hover{background:var(--canvas)}
+.pk.now{font-weight:600;color:var(--accent-strong)}
+.pk.year.on{background:var(--accent-fill);color:var(--on-fill);font-weight:600}
+.pk.month{height:30px}
+.pk.month.on{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.divider{width:1px;height:20px;background:var(--line)}

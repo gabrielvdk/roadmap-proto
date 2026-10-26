@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Roadmapper</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="vendor/fonts.css">
+<link rel="stylesheet" href="app.css">
+<script src="boot.js"></script>
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<header style="display:flex;align-items:center;gap:20px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:10px;font-family:var(--font-title);font-weight:700;font-size:18px;letter-spacing:.005em;white-space:nowrap"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="5" width="12" height="4" rx="2" fill="var(--accent)"></rect><rect x="8" y="11" width="13" height="4" rx="2" fill="var(--green)"></rect><rect x="5" y="17" width="10" height="4" rx="2" fill="var(--amber)"></rect></svg>Roadmapper</div>
+<nav class="vtabs"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.set }}" class="{{ t.cls }}">{{ t.label }}</button></sc-for></nav>
+<span style="flex:1"></span>
+<button onClick="{{ newEpic }}" class="btn primary" style="height:auto;padding:7px 12px;font-size:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New epic</button>
+</header>
+
+<div style="display:flex;align-items:center;gap:12px;padding:18px 24px 0;flex-wrap:wrap">
+<h1 style="margin:0;font-family:var(--font-title);font-size:22px;font-weight:700;letter-spacing:.005em">{{ viewTitle }}</h1>
+<span style="color:var(--ink-3);font-weight:500">{{ viewCount }}</span>
+<div style="margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px 12px;flex-wrap:wrap;font-size:13px;white-space:nowrap;min-width:0">
+<sc-if value="{{ showGroupSeg }}" hint-placeholder-val="{{ true }}">
+<span style="color:var(--ink-2)">Group by</span>
+<div class="seg"><sc-for list="{{ groupOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.set }}" class="{{ o.cls }}">{{ o.label }}</button></sc-for></div>
+</sc-if>
+<sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+<span style="color:var(--ink-2)">Group by</span>
+<select onChange="{{ setG1 }}" class="toolbar-select" aria-label="Group by"><sc-for list="{{ g1Opts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.label }}</option></sc-for></select>
+<span style="color:var(--ink-2)">then</span>
+<select onChange="{{ setG2 }}" class="toolbar-select" aria-label="Then group by"><sc-for list="{{ g2Opts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.label }}</option></sc-for></select>
+</sc-if>
+<div style="position:relative">
+<button onClick="{{ toggleFilter }}" class="btn sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>Filter<sc-if value="{{ fCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;box-sizing:border-box;border-radius:9px;background:var(--accent-fill);color:var(--on-fill);font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px">{{ fCount }}</span></sc-if></button>
+<sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+<div class="scrim" onClick="{{ toggleFilter }}" style="z-index:20"></div>
+<div class="pop" style="position:absolute;right:0;top:calc(100% + 6px);z-index:21;width:min(640px,calc(100vw - 32px));box-sizing:border-box;padding:14px;white-space:normal">
+<div class="cols3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 16px">
+<div style="display:flex;flex-direction:column"><span class="caption" style="padding-bottom:4px">Application</span><sc-for list="{{ fAppOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.toggle }}" class="opt"><span class="{{ o.chk }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>{{ o.label }}</button></sc-for></div>
+<div style="display:flex;flex-direction:column"><span class="caption" style="padding-bottom:4px">Theme</span><sc-for list="{{ fThemeOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.toggle }}" class="opt"><span class="{{ o.chk }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>{{ o.label }}</button></sc-for></div>
+<div style="display:flex;flex-direction:column"><span class="caption" style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px">Stage<button onClick="{{ stagesAll }}" class="link" style="padding:0 2px;letter-spacing:0;text-transform:none">All stages</button></span><sc-for list="{{ fStageOpts }}" as="o" hint-placeholder-count="8"><button onClick="{{ o.toggle }}" class="opt"><span class="{{ o.chk }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="{{ o.dot }}"></span>{{ o.label }}</button></sc-for></div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:8px;padding-top:10px;font-size:12.5px;color:var(--ink-2)"><span>{{ fSummary }}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto"><button onClick="{{ clearFilters }}" class="link" style="font-size:13px">Clear filters</button><button onClick="{{ toggleFilter }}" class="btn primary sm">Apply filter</button></div></div>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+<span class="divider"></span>
+<span style="color:var(--ink-2)">Quarters</span>
+<div class="seg"><sc-for list="{{ qOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.set }}" class="{{ o.cls }}">{{ o.label }}</button></sc-for></div>
+<div style="display:flex;gap:2px">
+<button onClick="{{ shiftBack }}" title="Earlier" aria-label="Earlier" class="btn sm icon">‹</button>
+<button onClick="{{ goToday }}" class="btn sm">Today</button>
+<button onClick="{{ shiftFwd }}" title="Later" aria-label="Later" class="btn sm icon">›</button>
+</div>
+</sc-if>
+<sc-if value="{{ showDetailsToggle }}" hint-placeholder-val="{{ false }}">
+<span class="divider"></span>
+<button onClick="{{ toggleDetails }}" class="opt" style="height:30px;padding:0 8px;font-size:13px"><span class="{{ detailsChk }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>Details</button>
+</sc-if>
+</div>
+</div>
+
+<main style="flex:1;padding:14px 24px 18px;min-width:0">
+
+<sc-if value="{{ isBoard }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:8px">
+<sc-for list="{{ boardGroups }}" as="g" hint-placeholder-count="6">
+<div onDragOver="{{ g.over }}" onDrop="{{ g.drop }}" style="flex:0 0 268px;background:{{ g.bg }};outline:{{ g.ol }};border-top:{{ g.top }};border-radius:var(--radius-lg);padding:8px;display:flex;flex-direction:column;gap:8px;min-height:120px">
+<div style="display:flex;align-items:center;gap:8px;padding:4px 6px 2px"><span style="font-weight:700;font-size:13.5px;color:{{ g.hc }}">{{ g.label }}</span><span style="margin-left:auto;font-size:12px;color:var(--ink-2);background:var(--surface);border-radius:10px;padding:1px 8px">{{ g.count }}</span></div>
+<sc-for list="{{ g.items }}" as="e" hint-placeholder-count="2">
+<div draggable="true" onDragStart="{{ e.dragStart }}" onDragEnd="{{ dragEnd }}" onClick="{{ e.open }}" style="opacity:{{ e.op }};background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-sm);padding:9px 11px;display:flex;flex-direction:column;gap:6px;cursor:grab" style-hover="box-shadow:var(--shadow-md);border-color:var(--line-strong)">
+<div style="font-weight:600;font-size:14px;line-height:1.3">{{ e.title }}</div>
+<sc-if value="{{ showCardApp }}" hint-placeholder-val="{{ true }}"><div style="font-size:12.5px;color:var(--ink-2)">{{ e.app }}</div></sc-if>
+<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>{{ e.forecastTxt }}<sc-if value="{{ e.slip }}" hint-placeholder-val="{{ false }}"><span class="slip">{{ e.slipShort }}</span></sc-if></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="{{ e.badge }}"><sc-if value="{{ e.done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{ e.status }}</span><sc-if value="{{ showCardStage }}" hint-placeholder-val="{{ false }}"><span style="{{ e.stChip }}"><span style="{{ e.stDot }}"></span>{{ e.stName }}</span></sc-if></div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;max-width:1400px">
+<sc-for list="{{ listGroups }}" as="g" hint-placeholder-count="4">
+<div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden">
+<div style="display:flex;align-items:baseline;gap:10px;padding:10px 16px 10px 12px;border-bottom:1px solid var(--line);border-left:{{ g.bl }};background:{{ g.hbg }}"><span style="font-weight:700;font-size:15px;color:{{ g.hc }}">{{ g.label }}</span><span style="font-size:12.5px;color:var(--ink-2)">{{ g.countTxt }}</span></div>
+<div style="overflow-x:auto">
+<div style="display:grid;grid-template-columns:minmax(220px,2fr) 120px 190px minmax(280px,4fr);font-size:13px;font-weight:700;border-bottom:1px solid var(--line)"><span style="padding:7px 16px">Epic</span><span style="padding:7px 12px">Health</span><span style="padding:7px 12px">Forecast</span><span style="padding:7px 16px 7px 12px">Last status update</span></div>
+<sc-for list="{{ g.items }}" as="e" hint-placeholder-count="3">
+<div onDoubleClick="{{ e.open }}" style="display:grid;grid-template-columns:minmax(220px,2fr) 120px 190px minmax(280px,4fr);border-bottom:1px solid var(--line);align-items:start;user-select:none" style-hover="background:var(--canvas)">
+<div style="padding:10px 16px;display:flex;flex-direction:column;gap:2px"><button onClick="{{ e.open }}" class="title-link" style="font-size:14.5px;line-height:1.3">{{ e.title }}</button><sc-if value="{{ showListApp }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:var(--ink-2)">{{ e.app }}</span></sc-if><sc-if value="{{ showListTheme }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:var(--ink-2)">{{ e.theme }}</span></sc-if><sc-if value="{{ showListStage }}" hint-placeholder-val="{{ false }}"><span style="margin-top:3px"><span style="{{ e.stChip }}"><span style="{{ e.stDot }}"></span>{{ e.stName }}</span></span></sc-if></div>
+<div style="padding:10px 12px"><span style="{{ e.badge }}"><sc-if value="{{ e.done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{ e.status }}</span></div>
+<div style="padding:10px 12px;font-size:13px;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;gap:2px"><span>{{ e.forecastTxt }}</span><sc-if value="{{ e.slip }}" hint-placeholder-val="{{ false }}"><span class="slip">{{ e.slipTxt }}</span></sc-if></div>
+<div style="padding:10px 16px 10px 12px;display:flex;flex-direction:column;gap:3px"><sc-if value="{{ e.last }}" hint-placeholder-val="{{ true }}"><span style="font-size:13.5px;line-height:1.45;text-wrap:pretty;user-select:text">{{ e.last.text }}</span><span title="{{ e.last.full }}" style="font-size:12px;color:var(--ink-2)">{{ e.last.when }} · {{ e.last.author }}</span></sc-if></div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMatrix }}" hint-placeholder-val="{{ false }}">
+<div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:auto">
+<div style="{{ mGrid }}">
+<div style="background:var(--canvas);border-bottom:1px solid var(--line)"></div>
+<sc-for list="{{ stageCols }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.label }}</div></sc-for>
+<sc-for list="{{ matrixRows }}" as="r" hint-placeholder-count="4">
+<div style="padding:8px 10px;font-weight:600;font-size:13.5px;line-height:1.25;border-bottom:1px solid var(--line)">{{ r.label }}</div>
+<sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="6">
+<div onDragOver="{{ c.over }}" onDrop="{{ c.drop }}" style="background:{{ c.bg }};padding:6px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);min-height:40px">
+<sc-for list="{{ c.items }}" as="e" hint-placeholder-count="1">
+<div draggable="true" onDragStart="{{ e.dragStart }}" onDragEnd="{{ dragEnd }}" onClick="{{ e.open }}" style="opacity:{{ e.op }};cursor:grab;display:flex;flex-direction:column;gap:1px;padding:4px 7px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface)" style-hover="border-color:var(--accent);box-shadow:var(--shadow-sm)">
+<div style="display:flex;gap:6px;align-items:center"><span style="{{ e.dot }}"></span><span style="font-size:12px;font-weight:600;line-height:1.25">{{ e.title }}</span></div>
+<span style="font-size:11px;color:var(--ink-2);line-height:1.3">{{ e.mOther }}</span>
+<span style="font-size:11px;color:var(--ink-2);line-height:1.3;font-variant-numeric:tabular-nums">{{ e.forecastTxt }}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;padding:10px 2px 0;font-size:12px;color:var(--ink-2)"><sc-for list="{{ legend }}" as="h" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:6px"><span style="{{ h.dot }}"></span>{{ h.label }}</span></sc-for></div>
+</sc-if>
+
+<sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+<div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden">
+<div ref="{{ scRef }}" style="overflow-x:auto;overscroll-behavior-x:contain">
+<div style="{{ tGrid }}">
+<div style="position:sticky;left:0;z-index:3;background:var(--canvas);border-bottom:1px solid var(--line);padding:6px 12px;font-size:13px;font-weight:700;display:flex;align-items:flex-end;box-shadow:1px 0 0 var(--line)">Epic</div>
+<div style="display:flex;background:var(--canvas);border-bottom:1px solid var(--line)">
+<sc-for list="{{ quarters }}" as="q" hint-placeholder-count="8"><div style="{{ q.style }}"><div style="padding:0 6px;font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden">{{ q.label }}</div><sc-if value="{{ showMonths }}" hint-placeholder-val="{{ true }}"><div style="display:grid;grid-template-columns:repeat(3,1fr);font-size:10.5px;color:var(--ink-2)"><sc-for list="{{ q.months }}" as="m" hint-placeholder-count="3"><span style="padding:0 6px">{{ m }}</span></sc-for></div></sc-if></div></sc-for>
+</div>
+<div style="{{ gridLines }}"></div>
+<sc-for list="{{ tRows }}" as="r" hint-placeholder-count="10">
+<sc-if value="{{ r.isG1 }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;height:30px;background:var(--canvas);border-bottom:1px solid var(--line)"><span style="position:sticky;left:0;display:inline-flex;align-items:center;gap:8px;height:30px;white-space:nowrap;padding:0 12px;font-weight:700;font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-2)"><span style="{{ r.gd }}"></span>{{ r.label }}<span style="font-weight:500;text-transform:none;letter-spacing:0;font-size:12px;color:var(--ink-3)">{{ r.count }}</span></span></div></sc-if>
+<sc-if value="{{ r.isG2 }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;height:24px;background:color-mix(in srgb,var(--canvas) 55%,var(--surface));border-bottom:1px solid var(--line)"><span style="position:sticky;left:0;display:inline-flex;align-items:center;gap:8px;height:24px;white-space:nowrap;padding:0 12px 0 26px;font-weight:600;font-size:12.5px;color:var(--ink-2)"><span style="{{ r.gd }}"></span>{{ r.label }}<span style="font-weight:400;font-size:11.5px;color:var(--ink-3)">{{ r.count }}</span></span></div></sc-if>
+<sc-if value="{{ r.isE }}" hint-placeholder-val="{{ true }}">
+<div style="{{ r.labelStyle }}"><button onClick="{{ r.open }}" class="title-link" style="font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</button><sc-if value="{{ details }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;line-height:1.2"><span style="{{ r.stDot }}"></span><span style="overflow:hidden;text-overflow:ellipsis">{{ r.tSub }}</span></span></sc-if></div>
+<div style="{{ r.trackStyle }}">
+<sc-if value="{{ r.hasBar }}" hint-placeholder-val="{{ false }}">
+<sc-if value="{{ r.bar.hasPlan }}" hint-placeholder-val="{{ false }}"><div style="{{ r.bar.plan }}"></div></sc-if>
+<div onMouseDown="{{ r.downMove }}" title="{{ r.barTip }}" style="{{ r.bar.box }}">
+<div style="{{ r.bar.fill }}"></div>
+<sc-if value="{{ r.bar.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="var(--on-fill)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style="{{ r.bar.check }}"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+<sc-if value="{{ r.bar.hasAS }}" hint-placeholder-val="{{ false }}"><div style="{{ r.bar.tickS }}"></div></sc-if>
+<sc-if value="{{ r.bar.hasAE }}" hint-placeholder-val="{{ false }}"><div style="{{ r.bar.tickE }}"></div></sc-if>
+<sc-if value="{{ r.canStart }}" hint-placeholder-val="{{ false }}"><div onMouseDown="{{ r.downStart }}" style="position:absolute;top:-4px;bottom:-4px;left:-5px;width:10px;cursor:ew-resize"></div></sc-if>
+<sc-if value="{{ r.canEnd }}" hint-placeholder-val="{{ false }}"><div onMouseDown="{{ r.downEnd }}" style="position:absolute;top:-4px;bottom:-4px;right:-5px;width:10px;cursor:ew-resize"></div></sc-if>
+</div>
+<sc-if value="{{ r.bar.hasSlip }}" hint-placeholder-val="{{ false }}"><span style="{{ r.bar.sl }}">{{ r.bar.slipTxt }}</span></sc-if>
+</sc-if>
+</div>
+</sc-if>
+</sc-for>
+<div style="{{ todayStyle }}"></div>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:18px;align-items:center;padding:10px 2px 0;font-size:12px;color:var(--ink-2);flex-wrap:wrap">
+<sc-for list="{{ tLegend }}" as="h" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:6px"><span style="{{ h.sw }}"><sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="var(--on-fill)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style="width:8px;height:8px;margin-right:2px"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>{{ h.label }}</span></sc-for>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:24px;height:4px;border-radius:2px;background:var(--grey-fill)"></span>Original plan</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="position:relative;width:24px;height:10px;border-radius:3px;background:var(--line-strong)"><span style="position:absolute;left:-1px;top:-3px;width:2px;height:16px;background:var(--ink)"></span></span>Actual start / end</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:2px;height:14px;background:var(--ink)"></span>Today</span>
+<span style="margin-left:auto">Bar = actual dates where known, otherwise forecast. Drag a bar or its open end to change the forecast.</span>
+</div>
+</sc-if>
+
+</main>
+<footer style="padding:4px 24px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-3)"><span>Appearance</span><div class="seg"><sc-for list="{{ themeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.set }}" type="button" class="{{ o.cls }}" aria-pressed="{{ o.on }}" style="height:26px;font-size:12.5px">{{ o.label }}</button></sc-for></div><span>· saved in this browser</span></footer>
+
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+<div class="backdrop" style="z-index:40;align-items:center">
+<div class="dialog" role="dialog" aria-modal="true" aria-label="Update forecast dates" style="max-width:440px;padding:20px;gap:12px;box-sizing:border-box">
+<span style="font-family:var(--font-title);font-weight:700;font-size:20px">Update forecast dates?</span>
+<span style="font-size:14px;font-weight:600">{{ cf.title }}</span>
+<div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px;font-variant-numeric:tabular-nums"><span style="color:var(--ink-2)">Current</span><span>{{ cf.from }}</span><span style="color:var(--ink-2)">New</span><span style="font-weight:600;color:var(--accent-strong)">{{ cf.to }}</span></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;padding-top:6px">
+<button onClick="{{ cancelConfirm }}" class="btn">Cancel</button>
+<button onClick="{{ applyConfirm }}" class="btn primary">Update forecast</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+<div class="backdrop" onClick="{{ closeModal }}" style="z-index:10;align-items:flex-start;padding:6vh 16px">
+<div class="dialog" onClick="{{ stop }}" role="dialog" aria-modal="true" aria-label="Epic" style="max-width:960px">
+<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)">
+<input value="{{ d.title }}" onChange="{{ on.title }}" maxLength="200" placeholder="Epic title" aria-label="Title" style="flex:1;min-width:0;border:1px solid transparent;border-radius:var(--radius-md);padding:4px 8px;margin-left:-8px;font-family:var(--font-title);font-weight:700;font-size:20px;background:transparent;outline:none" style-hover="border-color:var(--line-strong)" style-focus="border-color:var(--accent)">
+<button onClick="{{ closeModal }}" title="Close" aria-label="Close" class="btn ghost icon" style="width:32px;height:32px;font-size:20px;font-weight:400">×</button>
+</div>
+<div class="mgrid">
+<div class="main">
+<div class="mtabs"><span class="mtab on" style="cursor:default">Details</span></div>
+<div class="mbody">
+<label class="field">Description — what this epic delivers<textarea value="{{ d.desc }}" onChange="{{ on.desc }}" maxLength="4000" rows="3" class="ctl" style="resize:vertical"></textarea></label>
+<div class="cols3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+<label class="field">Application<select value="{{ d.app }}" onChange="{{ on.app }}" class="ctl"><sc-for list="{{ appList }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label class="field">Theme<select value="{{ d.theme }}" onChange="{{ on.theme }}" class="ctl"><sc-for list="{{ themeList }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label class="field"><span style="display:flex;align-items:center;gap:6px"><span style="{{ dStageDot }}"></span>Stage</span><select value="{{ d.stage }}" onChange="{{ on.stage }}" class="ctl"><sc-for list="{{ stageOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+</div>
+<sc-if value="{{ showHealth }}" hint-placeholder-val="{{ true }}"><div class="field" style="gap:6px">Health<div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ healthBtns }}" as="h" hint-placeholder-count="3"><button onClick="{{ h.set }}" style="{{ h.style }}">{{ h.label }}</button></sc-for></div></div></sc-if>
+<div class="field" style="gap:6px">Dates
+<div style="display:grid;grid-template-columns:76px minmax(0,1fr) minmax(0,1fr);gap:6px 10px;align-items:center;font-size:13px;font-weight:400;color:var(--ink)">
+<span></span><span style="font-size:11.5px;color:var(--ink-2)">Start</span><span style="font-size:11.5px;color:var(--ink-2)">End</span>
+<sc-for list="{{ dateRows }}" as="r" hint-placeholder-count="3">
+<span style="font-weight:500">{{ r.label }}</span>
+<sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="2">
+<div style="position:relative;min-width:0">
+<button onClick="{{ c.toggle }}" class="ctl" style="height:32px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 8px;cursor:pointer;font-size:13px;color:{{ c.color }}" style-hover="border-color:var(--accent)">{{ c.txt }}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></button>
+<sc-if value="{{ c.open }}" hint-placeholder-val="{{ false }}">
+<div class="scrim" onClick="{{ closePicker }}" style="z-index:30"></div>
+<div class="pop" style="position:absolute;top:calc(100% + 4px);left:0;z-index:31;width:244px;padding:10px;display:flex;flex-direction:column;gap:8px">
+<div style="display:grid;grid-template-columns:26px 1fr 1fr 1fr 26px;gap:4px;align-items:center">
+<button onClick="{{ pk.prev }}" title="Earlier" aria-label="Earlier years" class="pk" style="font-size:16px">‹</button>
+<sc-for list="{{ pk.years }}" as="y" hint-placeholder-count="3"><button onClick="{{ y.set }}" class="{{ y.cls }}">{{ y.label }}</button></sc-for>
+<button onClick="{{ pk.next }}" title="Later" aria-label="Later years" class="pk" style="font-size:16px">›</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;border-top:1px solid var(--line);padding-top:8px">
+<sc-for list="{{ pk.months }}" as="m" hint-placeholder-count="12"><button onClick="{{ m.set }}" class="{{ m.cls }}">{{ m.label }}</button></sc-for>
+</div>
+<button onClick="{{ pk.clear }}" class="link" style="align-self:flex-start">Clear</button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</sc-for>
+</div>
+<sc-if value="{{ dSlip }}" hint-placeholder-val="{{ false }}"><span class="slip" style="font-size:12px">{{ dSlipTxt }}</span></sc-if>
+</div>
+</div>
+</div>
+<div>
+<div class="mtabs"><sc-for list="{{ rtabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.set }}" class="{{ t.cls }}">{{ t.label }}<span class="n">{{ t.n }}</span></button></sc-for></div>
+<div class="mbody" style="gap:12px">
+<sc-if value="{{ isHistoryTab }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;max-height:470px;overflow:auto">
+<sc-for list="{{ history }}" as="h" hint-placeholder-count="3">
+<div class="entry" style="gap:6px">
+<div class="entry-meta"><span class="avatar">{{ h.initials }}</span><span><b style="font-weight:600;color:var(--ink)">{{ h.author }}</b> {{ h.summary }}</span><span title="{{ h.full }}">{{ h.when }}</span><sc-if value="{{ h.via }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;padding:1px 7px;border-radius:9px;background:var(--line);color:var(--ink-2)">{{ h.via }}</span></sc-if></div>
+<sc-if value="{{ h.changed }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;font-size:13px;line-height:1.4;padding-left:30px">
+<sc-for list="{{ h.changes }}" as="c" hint-placeholder-count="2"><span style="color:var(--ink-2);white-space:nowrap">{{ c.field }}</span><span><span style="color:var(--ink-2);text-decoration:line-through;text-decoration-color:var(--grey-fill)">{{ c.from }}</span> → <span style="font-weight:600;color:var(--accent-strong)">{{ c.to }}</span></span></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<sc-if value="{{ noHistory }}" hint-placeholder-val="{{ false }}"><span class="muted">No changes recorded yet. Changes are logged when you save.</span></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ isUpdatesTab }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:8px;align-items:flex-start">
+<textarea value="{{ newUpd }}" onChange="{{ setNewUpd }}" maxLength="4000" rows="2" placeholder="What's the latest?" aria-label="New status update" class="ctl" style="flex:1;font-size:13.5px;resize:vertical"></textarea>
+<button onClick="{{ addUpdate }}" disabled="{{ noUpd }}" class="btn" style="height:36px">Post</button>
+</div>
+<div style="display:flex;flex-direction:column;max-height:400px;overflow:auto">
+<sc-for list="{{ dUpdates }}" as="u" hint-placeholder-count="2">
+<div class="entry" style="gap:3px">
+<div class="entry-meta"><span class="avatar">{{ u.initials }}</span><span style="font-weight:600;color:var(--ink)">{{ u.author }}</span><span title="{{ u.full }}">{{ u.when }}</span></div>
+<span style="font-size:13.5px;line-height:1.45;text-wrap:pretty;white-space:pre-wrap">{{ u.text }}</span>
+</div>
+</sc-for>
+<sc-if value="{{ noUpdates }}" hint-placeholder-val="{{ false }}"><span class="muted">No updates yet.</span></sc-if>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--line)">
+<button onClick="{{ closeModal }}" class="btn">Cancel</button>
+<button onClick="{{ save }}" class="btn primary" style="padding:0 18px">Save</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+// ---------- Fixed lists ----------
+const THEMES=['Energy Management','IPM','Yield Prediction','Cultivation'];
+const APPS=['IIVO','Intelligent Algorithms','LetsGrow.com','Intelligent Assistance'];
+const STAGES=['Backlog','Validation','Prototyping','Development','Productization','Launch','Learn','Done'];
+const BACKLOG=0,DONE=STAGES.length-1;
+// Backlog and Done sit outside the pipeline: the default stage filter leaves them out.
+const DEFAULT_STAGES=STAGES.map((s,i)=>i).filter(i=>i!==BACKLOG&&i!==DONE);
+// Stage colors taken from the product pipeline slide; Backlog is neutral, Done uses the finished green.
+const STAGE_C=['var(--grey-fill)','#6a3d9a','#3f9b5b','#1f58a3','#e3a310','#c8326e','#159fa6','var(--done)'];
+// Status colors shared with EOSTracker (DESIGN.md 2.1): tint background, darker text, solid for bars and dots.
+const HEALTH={
+  'On track':{bg:'var(--green-soft)',fg:'color-mix(in srgb,var(--green) 70%,var(--ink))',bd:'var(--green)'},
+  'At risk':{bg:'var(--amber-soft)',fg:'color-mix(in srgb,var(--amber) 70%,var(--ink))',bd:'var(--amber)'},
+  'Late':{bg:'var(--red-soft)',fg:'color-mix(in srgb,var(--red) 75%,var(--ink))',bd:'var(--red)'}};
+// What a badge, dot or bar shows: the Done/Backlog stage wins over health (health only applies to active work).
+const STATUS={...HEALTH,
+  'Done':{bg:'color-mix(in srgb,var(--done) 16%,var(--surface))',fg:'color-mix(in srgb,var(--done) 85%,var(--ink))',bd:'var(--done)'},
+  'Backlog':{bg:'var(--canvas)',fg:'var(--ink-2)',bd:'var(--grey-fill)'}};
+const LEGEND=['On track','At risk','Late','Done'];
+// Audited fields, in display order.
+const FIELDS=[['title','Title'],['desc','Description'],['app','Application'],['theme','Theme'],['stage','Stage'],['health','Health'],
+  ['ps','Planned start'],['pe','Planned end'],['fs','Forecast start'],['fe','Forecast end'],['as','Actual start'],['ae','Actual end']];
+const FLBL=Object.fromEntries(FIELDS);
+const DATEF=['ps','pe','fs','fe','as','ae'];
+const VIEWS=[['board','Board'],['list','List'],['matrix','Matrix'],['timeline','Timeline']];
+const LBL={theme:'Theme',app:'Application',stage:'Stage',none:'None'};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Bump KEY when the data shape changes or the seed must reload for everyone (v4.2 added Backlog and Done).
+const KEY='lg-roadmap-v4.2',THEME_KEY='lg-roadmap-theme';
+const LABELW=270;
+const MAX={id:40,name:80,via:20,title:200,text:4000};
+
+// ---------- Months and dates ----------
+// Months are 'YYYY-MM' strings; abs() turns one into a month count for arithmetic, str() turns it back.
+const abs=s=>{if(!s)return null;const[y,m]=s.split('-').map(Number);return y*12+m-1;};
+const str=m=>Math.floor(m/12)+'-'+String(m%12+1).padStart(2,'0');
+const fs=s=>{if(!s)return '…';const[y,m]=s.split('-').map(Number);return MON[m-1]+' ’'+String(y).slice(2);};
+const fl=s=>{if(!s)return '';const[y,m]=s.split('-').map(Number);return MON[m-1]+' '+y;};
+const rng=(a,b)=>a||b?fs(a)+' – '+fs(b):'Not set';
+const fullDT=iso=>{const d=new Date(iso);return d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear()+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const rel=iso=>{const d=new Date(iso),s=(Date.now()-d)/1000;
+  if(s<60)return 'just now';
+  if(s<3600)return Math.floor(s/60)+' min ago';
+  if(s<86400){const n=Math.floor(s/3600);return n+(n===1?' hr ago':' hrs ago');}
+  if(s<7*86400){const n=Math.floor(s/86400);return n+(n===1?' day ago':' days ago');}
+  return d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear();};
+const NOW=new Date();
+const TODAY=NOW.getFullYear()*12+NOW.getMonth()+(NOW.getDate()-1)/31;
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+const initials=name=>name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const byDateDesc=(a,b)=>b.date.localeCompare(a.date);
+
+// ---------- Epics ----------
+const statusOf=e=>e.stage===DONE?'Done':e.stage===BACKLOG?'Backlog':e.health;
+// Months the end (actual, else forecast) lies past the planned end; 0 when either is unknown.
+const slipOf=e=>{const end=abs(e.ae||e.fe),pe=abs(e.pe);return end!=null&&pe!=null?Math.max(0,end-pe):0;};
+const keyOf=(e,by)=>by==='theme'?e.theme:by==='app'?e.app:STAGES[e.stage];
+const keysOf=by=>by==='theme'?THEMES:by==='app'?APPS:STAGES;
+const patchFor=(by,k)=>by==='stage'?{stage:STAGES.indexOf(k)}:{[by]:k};
+// Moves or resizes the forecast by dm months (Timeline drag).
+function shiftF(e,mode,dm){
+  let f0=abs(e.fs||e.ps),f1=abs(e.fe||e.pe);if(f0==null)return {};if(f1==null)f1=f0;
+  if(mode==='move'){f0+=dm;f1+=dm;}else if(mode==='start'){f0=Math.min(f0+dm,f1);}else{f1=Math.max(f1+dm,f0);}
+  return {fs:str(f0),fe:str(f1)};
+}
+
+// ---------- Audit trail ----------
+// One entry per save or drag: {date, author, via, changes:[{field,from,to}]}, or {date, author, via, created:true}.
+const fmtVal=(f,v)=>{if(v===''||v==null)return 'empty';if(f==='stage')return STAGES[v]??String(v);if(DATEF.includes(f))return fl(v);return String(v);};
+const diff=(a,b)=>FIELDS.map(([f])=>f).filter(f=>(a[f]??'')!==(b[f]??'')).map(f=>({field:f,from:a[f]??'',to:b[f]??''}));
+const auditEntries=(a,b,via)=>{const changes=diff(a,b);return changes.length?[{date:new Date().toISOString(),author:'You',via,changes}]:[];};
+// Folds per-field entries ({field,from,to}, as written in SEED_AUDIT) into change sets by date, author and source.
+const normAudit=list=>{const out=[];list.forEach(a=>{if(a.changes||a.created){out.push(a);return;}
+  if(a.field==='created'){out.push({date:a.date,author:a.author,via:a.via,created:true});return;}
+  const l=out[out.length-1],c={field:a.field,from:a.from,to:a.to};
+  if(l&&l.changes&&l.date===a.date&&l.author===a.author&&l.via===a.via)l.changes.push(c);else out.push({date:a.date,author:a.author,via:a.via,changes:[c]});});return out;};
+
+// ---------- Validation ----------
+// Stored data is only written by this page, but it is still treated as untrusted input:
+// every field is checked against its type and allowed values, and anything else is dropped or reset.
+const txt=(v,max)=>typeof v==='string'?v.slice(0,max):'';
+const month=v=>typeof v==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(v)?v:'';
+const iso=v=>{if(typeof v!=='string')return null;const d=new Date(v);return isNaN(d)?null:d.toISOString();};
+const oneOf=(v,list)=>list.includes(v)?v:list[0];
+const cleanAudit=list=>normAudit((Array.isArray(list)?list:[]).filter(a=>a&&typeof a==='object')).map(a=>{
+  const date=iso(a.date);if(!date)return null;
+  const base={date,author:txt(a.author,MAX.name)||'Unknown',via:txt(a.via,MAX.via)};
+  if(a.created)return {...base,created:true};
+  const changes=(Array.isArray(a.changes)?a.changes:[]).filter(c=>c&&Object.hasOwn(FLBL,c.field))
+    .map(c=>({field:c.field,from:typeof c.from==='number'?c.from:txt(c.from,MAX.text),to:typeof c.to==='number'?c.to:txt(c.to,MAX.text)}));
+  return changes.length?{...base,changes}:null;}).filter(Boolean);
+const cleanEpic=e=>{
+  if(!e||typeof e!=='object'||typeof e.id!=='string'||!e.id)return null;
+  const n={id:e.id.slice(0,MAX.id),title:txt(e.title,MAX.title)||'Untitled epic',desc:txt(e.desc,MAX.text),app:oneOf(e.app,APPS),theme:oneOf(e.theme,THEMES),
+    stage:Number.isInteger(e.stage)&&e.stage>=0&&e.stage<STAGES.length?e.stage:BACKLOG,health:oneOf(e.health,Object.keys(HEALTH))};
+  DATEF.forEach(f=>n[f]=month(e[f]));
+  n.updates=(Array.isArray(e.updates)?e.updates:[]).map(u=>u&&iso(u.date)&&txt(u.text,MAX.text)?{date:iso(u.date),author:txt(u.author,MAX.name)||'Unknown',text:txt(u.text,MAX.text)}:null).filter(Boolean);
+  n.audit=cleanAudit(e.audit);
+  return n;};
+
+// ---------- Seed (fictional sample data; the repo is public) ----------
+// [title, desc, app, theme, stage, (unused), health, ps, pe, fs, fe, as, ae, updates[[date, author, text]]]
+const SEED_ROWS=[
+['Heat demand forecasting','Predicts 48-hour heat demand per compartment so growers can plan boiler and buffer use.','IIVO','Energy Management',3,'','On track','2026-05','2026-12','2026-06','2027-01','2026-06','',[['2026-07-14T10:20','Sanne','Kick-off done, data access arranged for three pilot growers.'],['2026-10-03T08:40','Sanne','Model v2 in test with three pilot growers. Accuracy within 8% on most days; next step is the IIVO screen design.']]],
+['CHP dispatch optimiser','Schedules CHP runs against day-ahead power prices and heat demand.','Intelligent Algorithms','Energy Management',2,'','At risk','2026-08','2027-02','2026-10','2027-04','2026-10','',[['2026-10-01T16:05','Pieter','Price feed contract not signed yet; start moved two months. Escalated to management.']]],
+['Energy dashboard v2','Gas, power and heat balance per site with monthly benchmarks.','LetsGrow.com','Energy Management',4,'','Late','2026-03','2026-09','2026-03','2026-11','2026-03','',[['2026-09-18T11:30','Lotte','Feature complete. Help-centre articles in review, release notes drafted.']]],
+['Disease risk alerts','Notifies growers when climate conditions favour botrytis or mildew.','Intelligent Assistance','IPM',1,'','On track','2026-11','2027-03','2026-11','2027-03','','',[['2026-09-12T13:10','Eva','Interviews planned with 8 growers in November.']]],
+['Biological control planner','Plans the release of beneficials based on scouting data.','LetsGrow.com','IPM',5,'','On track','2026-01','2026-08','2026-01','2026-09','2026-01','2026-09',[['2026-09-26T10:00','Lotte','Released to all customers. Launch webinar scheduled 15 October.']]],
+['Tomato yield prediction','Weekly kg/m² forecast for tomato, six weeks ahead.','Intelligent Algorithms','Yield Prediction',4,'','On track','2026-02','2026-10','2026-02','2026-12','2026-02','',[['2026-09-24T16:30','Pieter','Pricing tiers being finalised with sales.']]],
+['Yield prediction in IIVO','Shows yield forecasts next to the climate strategy in IIVO.','IIVO','Yield Prediction',2,'','At risk','2026-10','2027-04','2026-12','2027-06','','',[['2026-09-27T10:50','Sanne','API contract with the Algorithms team still open.']]],
+['Harvest forecast reporting','Shares harvest forecasts with buyers and packers.','LetsGrow.com','Yield Prediction',1,'','On track','2027-03','2027-09','2027-03','2027-09','','',[['2026-09-10T14:00','Lotte','Validating willingness to pay with four packers.']]],
+['Climate setpoint advice','Recommends daily temperature and humidity setpoints.','Intelligent Assistance','Cultivation',3,'','On track','2026-07','2027-01','2026-07','2027-01','2026-07','',[['2026-09-25T08:15','Eva','Beta with five growers starts in January.']]],
+['Irrigation strategy','Optimises irrigation start and frequency using drain data.','IIVO','Cultivation',2,'','On track','2027-02','2027-08','2027-02','2027-08','','',[['2026-09-08T12:30','Sanne','Kick-off planned for February.']]],
+['Greenhouse energy benchmark','Compares gas and power use per m² with similar greenhouses.','LetsGrow.com','Energy Management',7,'','On track','2025-09','2026-04','2025-09','2026-05','2025-10','2026-06',[['2026-06-30T15:00','Lotte','Learn phase closed: 64% of customers use the benchmark monthly. Follow-ups move into Energy dashboard v2.']]],
+['Water quality alerts','Warns when drain EC or pH drifts outside the target range.','Intelligent Assistance','Cultivation',0,'','On track','','','','','','',[['2026-09-29T09:30','Eva','Idea from the customer advisory board; parked until the Climate setpoint beta has run.']]],
+['Multi-site energy reporting','One energy report across all sites of a grower group.','LetsGrow.com','Energy Management',0,'','On track','2027-06','2027-12','','','','',[['2026-08-21T11:00','Lotte','Requested by two large grower groups; to be sized in Q1 planning.']]]
+];
+// Sample audit history: [epicId, date, author, via, field, from, to]. Epic ids e1… follow the row order above.
+const SEED_AUDIT=[
+['e1','2026-08-20T09:12','Sanne','Board','stage',2,3],['e1','2026-09-02T14:30','Sanne','Timeline','fe','2026-12','2027-01'],
+['e2','2026-09-18T10:05','Pieter','Modal','health','On track','At risk'],['e2','2026-10-01T16:02','Pieter','Timeline','fs','2026-08','2026-10'],['e2','2026-10-01T16:02','Pieter','Timeline','fe','2027-02','2027-04'],
+['e3','2026-07-01T11:00','Lotte','Matrix','stage',3,4],['e3','2026-08-14T15:40','Lotte','Modal','fe','2026-09','2026-11'],
+['e5','2026-09-26T09:55','Lotte','Board','stage',4,5],['e5','2026-09-26T09:56','Lotte','Modal','ae','','2026-09'],
+['e7','2026-09-27T10:45','Sanne','Modal','health','On track','At risk'],
+['e11','2026-04-14T10:20','Lotte','Board','stage',5,6],['e11','2026-06-30T15:05','Lotte','Modal','stage',6,7],['e11','2026-06-30T15:05','Lotte','Modal','ae','','2026-06']];
+// Each seed epic gets a "created" entry two weeks before its first activity.
+const seedAudit=(id,updates)=>{const own=SEED_AUDIT.filter(a=>a[0]===id);
+  const first=updates.map(u=>u[0]).concat(own.map(a=>a[1])).sort()[0]||'2026-06-01T09:00';
+  return [{date:new Date(new Date(first).getTime()-14*86400000).toISOString(),author:(updates[0]||[])[1]||'Sanne',via:'Modal',field:'created'}]
+    .concat(own.map(a=>({date:a[1],author:a[2],via:a[3],field:a[4],from:a[5],to:a[6]})));};
+const SEED=SEED_ROWS.map((r,i)=>cleanEpic({id:'e'+(i+1),title:r[0],desc:r[1],app:r[2],theme:r[3],stage:r[4],health:r[6],ps:r[7],pe:r[8],fs:r[9],fe:r[10],as:r[11],ae:r[12],
+  updates:r[13].map(u=>({date:u[0],author:u[1],text:u[2]})),audit:seedAudit('e'+(i+1),r[13])}));
+
+// ---------- Storage (per browser; nothing leaves the device) ----------
+const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(s)){const eps=s.map(cleanEpic).filter(Boolean);if(eps.length)return eps;}}catch(e){}return SEED;};
+const store=epics=>{try{localStorage.setItem(KEY,JSON.stringify(epics));}catch(e){/* storage full or blocked: keep working in memory */}};
+const readTheme=()=>{try{const t=localStorage.getItem(THEME_KEY);return t==='dark'||t==='light'?t:null;}catch(e){return null;}};
+
+// ---------- Style helpers (dynamic colors only; static styles live in app.css) ----------
+const stTint=(i,p)=>'color-mix(in srgb, '+STAGE_C[i]+' '+p+'%, var(--surface))';
+const stInk=i=>'color-mix(in srgb, '+STAGE_C[i]+' 70%, var(--ink))';
+const stChip=i=>({display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11.5px',fontWeight:600,padding:'1px 8px 1px 6px',borderRadius:'10px',background:stTint(i,12),color:stInk(i),whiteSpace:'nowrap'});
+const stDot=i=>({width:'8px',height:'8px',flex:'none',borderRadius:'50%',background:STAGE_C[i]});
+const badge=h=>({display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'12.5px',fontWeight:600,padding:'2px 10px',borderRadius:'999px',background:STATUS[h].bg,color:STATUS[h].fg,whiteSpace:'nowrap'});
+const dot=h=>({width:'8px',height:'8px',flex:'none',borderRadius:'50%',background:STATUS[h].bd});
+const chk=on=>'chk'+(on?' on':'');
+const onCls=(base,flag)=>base+(flag?' on':'');
+
+class Component extends DCLogic {
+  state={epics:load(),view:'board',boardBy:'stage',listBy:'app',matrixBy:'app',g1:'app',g2:'none',nq:6,details:true,
+    fApps:[],fThemes:[],fStages:DEFAULT_STAGES,filterOpen:false,
+    draft:null,rtab:'updates',newUpd:'',picker:null,dragId:null,overKey:null,cw:0,tdrag:null,confirm:null,theme:readTheme()};
+
+  // ---------- Lifecycle ----------
+  componentDidMount(){
+    this._mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');
+    this._mqf=()=>{if(!this.state.theme)this.setState({});};
+    if(this._mq)this._mq.addEventListener('change',this._mqf);
+    // Escape closes the topmost layer.
+    this._k=e=>{if(e.key!=='Escape')return;const s=this.state;
+      if(s.picker)this.setState({picker:null});else if(s.confirm)this.cancelConfirm();else if(s.draft)this.close();else if(s.filterOpen)this.setState({filterOpen:false});};
+    window.addEventListener('keydown',this._k);}
+  componentWillUnmount(){window.removeEventListener('keydown',this._k);if(this._mq)this._mq.removeEventListener('change',this._mqf);if(this._ro)this._ro.disconnect();}
+  componentDidUpdate(){const st=this.state,pv=this._prev||{};this._prev={view:st.view,nq:st.nq};
+    if(st.view==='timeline'&&pv.view!=='timeline')this._needScroll=true;
+    if(this._needScroll&&st.view==='timeline')this.trySync();
+    // Keep the same month at the left edge when the zoom (quarters shown) changes.
+    if(pv.nq!=null&&pv.nq!==st.nq&&this._sc&&this._keepLeft!=null){this._sc.scrollLeft=this._keepLeft*this._mw;this._keepLeft=null;}}
+
+  // ---------- Light/dark: follows the OS until the user picks one; the choice is remembered per browser ----------
+  effTheme(){return this.state.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+  // light / dark / follow the computer (the footer's Appearance switch, like EOS Tracker's Profile → Appearance)
+  setTheme(m){if(m==='system'){document.documentElement.removeAttribute('data-theme');try{localStorage.removeItem(THEME_KEY);}catch(e){}this.setState({theme:null});return;}
+    document.documentElement.setAttribute('data-theme',m);try{localStorage.setItem(THEME_KEY,m);}catch(e){}this.setState({theme:m});}
+
+  // ---------- Timeline scrolling: measure the scroller width, scroll to today on first show ----------
+  scRef=el=>{
+    if(el===this._sc)return;
+    if(this._ro){this._ro.disconnect();this._ro=null;}
+    this._sc=el;
+    if(el){this._ro=new ResizeObserver(()=>requestAnimationFrame(()=>{const w=this._sc&&this._sc.clientWidth;if(w&&w!==this.state.cw)this.setState({cw:w});}));this._ro.observe(el);
+      this.trySync();}
+  };
+  trySync(){if(this._syncing)return;this._syncing=true;requestAnimationFrame(()=>{this._syncing=false;const sc=this._sc;if(!sc||!sc.isConnected)return;const w=sc.clientWidth;if(w&&w!==this.state.cw){this.setState({cw:w});return;}if(sc.scrollWidth>sc.clientWidth){this.scrollToday();this._needScroll=false;}});}
+  scrollToday(){if(this._sc&&this._mw)this._sc.scrollLeft=Math.max(0,(TODAY-this._R0-3)*this._mw);}
+
+  // ---------- Data changes (every change to an epic goes through persist) ----------
+  persist(epics){this.setState({epics});store(epics);}
+  patch(id,p,via){this.persist(this.state.epics.map(e=>{if(e.id!==id)return e;const n={...e,...p};return {...n,audit:[...e.audit,...auditEntries(e,n,via)]};}));}
+  save(){const d={...this.state.draft,title:this.state.draft.title.trim()||'Untitled epic'};const old=this.state.epics.find(e=>e.id===d.id);
+    const audit=old?[...old.audit,...auditEntries(old,d,'Modal')]:[{date:new Date().toISOString(),author:'You',via:'Modal',created:true}];
+    const n={...d,audit};this.persist(old?this.state.epics.map(e=>e.id===d.id?n:e):[...this.state.epics,n]);
+    // A new epic must not vanish behind the filter: let its application, theme and stage through.
+    if(!old){const add=(l,v)=>!l.length||l.includes(v)?l:[...l,v];this.setState(s=>({fApps:add(s.fApps,n.app),fThemes:add(s.fThemes,n.theme),fStages:add(s.fStages,n.stage)}));}
+    this.close();}
+  // Status updates are append-only and saved at once (not on Save), except for an epic that doesn't exist yet.
+  addUpdate(){const t=this.state.newUpd.trim();if(!t)return;const u={date:new Date().toISOString(),author:'You',text:t};const d={...this.state.draft,updates:[...this.state.draft.updates,u]};this.setState({draft:d,newUpd:''});if(this.state.epics.some(e=>e.id===d.id))this.persist(this.state.epics.map(e=>e.id===d.id?{...e,updates:d.updates}:e));}
+
+  // ---------- Modal ----------
+  open(e){const src=this.state.epics.find(x=>x.id===e.id)||e;this.setState({draft:JSON.parse(JSON.stringify(src)),newUpd:'',picker:null,rtab:'updates'});}
+  close(){this.setState({draft:null,newUpd:'',picker:null});}
+  setD(k,v){this.setState(s=>({draft:{...s.draft,[k]:v}}));}
+
+  // ---------- Drag and drop (Board and Matrix) ----------
+  dragProps(e){return {op:this.state.dragId===e.id?0.45:1,dragStart:ev=>{ev.dataTransfer.effectAllowed='move';try{ev.dataTransfer.setData('text/plain',e.id);}catch(x){}this.setState({dragId:e.id});}};}
+  dropZone(key,patch,via){const active=!!this.state.dragId&&this.state.overKey===key;return {active,
+    over:ev=>{if(!this.state.dragId)return;ev.preventDefault();if(this.state.overKey!==key)this.setState({overKey:key});},
+    drop:ev=>{ev.preventDefault();const id=this.state.dragId;if(id)this.patch(id,{...patch},via);this.setState({dragId:null,overKey:null});}};}
+
+  // ---------- Timeline bar drag: a click opens the epic, a drag asks for confirmation ----------
+  barDown(e,mode){return ev=>{
+    if(ev.button!==0)return;ev.preventDefault();ev.stopPropagation();
+    const x0=ev.clientX;let moved=false,dm=0;
+    const mv=m=>{const dx=m.clientX-x0;if(Math.abs(dx)>3)moved=true;if(!moved||mode==='none')return;const n=Math.round(dx/this._mw);if(n!==dm){dm=n;this.setState({tdrag:{id:e.id,mode,dm}});}};
+    const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);
+      if(!moved){this.setState({tdrag:null});this.open(e);return;}
+      if(dm===0||mode==='none'){this.setState({tdrag:null});return;}
+      const src=this.state.epics.find(x=>x.id===e.id);const n=shiftF(src,mode,dm);
+      this.setState({confirm:{id:e.id,title:src.title,from:rng(src.fs||src.ps,src.fe||src.pe),to:rng(n.fs,n.fe),n}});};
+    window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);};}
+  cancelConfirm(){this.setState({confirm:null,tdrag:null});}
+  applyConfirm(){const c=this.state.confirm;this.patch(c.id,c.n,'Timeline');this.setState({confirm:null,tdrag:null});}
+
+  // ---------- View models ----------
+  // An epic plus everything the views show about it.
+  deco(e){
+    const status=statusOf(e),slipM=slipOf(e),l=e.updates.slice().sort(byDateDesc)[0];
+    return {...e,status,badge:badge(status),dot:dot(status),stName:STAGES[e.stage],stChip:stChip(e.stage),stDot:stDot(e.stage),done:e.stage===DONE,
+      forecastTxt:rng(e.fs||e.ps,e.fe||e.pe),slip:slipM>0,slipTxt:'+'+slipM+' mo vs. plan',slipShort:'+'+slipM+' mo',
+      last:l?{text:l.text,when:rel(l.date),full:fullDT(l.date),author:l.author}:null,
+      open:()=>this.open(e),...this.dragProps(e)};
+  }
+  groups(by,eps,keys){return keys.map(k=>{const items=eps.filter(e=>keyOf(e,by)===k);return {label:k,count:items.length,items};});}
+
+  renderVals(){
+    const st=this.state;
+    const all=st.epics.map(e=>this.deco(e)).sort((a,b)=>(a.fs||a.ps||'').localeCompare(b.fs||b.ps||''));
+    // One filter for all views (application, theme, stage); an empty list means "all".
+    const pass={app:a=>!st.fApps.length||st.fApps.includes(a),theme:t=>!st.fThemes.length||st.fThemes.includes(t),stage:i=>!st.fStages.length||st.fStages.includes(i)};
+    const eps=all.filter(e=>pass.app(e.app)&&pass.theme(e.theme)&&pass.stage(e.stage));
+    // Groups, rows and columns only for the values the filter lets through.
+    const keysIn=by=>by==='stage'?STAGES.filter((s,i)=>pass.stage(i)):keysOf(by).filter(pass[by]);
+    return {...this.headerVals(eps),...this.filterVals(all,eps),...this.boardVals(eps,keysIn),...this.listVals(eps,keysIn),
+      ...this.matrixVals(eps,keysIn,pass.stage),...this.timelineVals(all,eps,keysIn),...this.modalVals()};
+  }
+
+  headerVals(eps){
+    const st=this.state,view=st.view,dark=this.effTheme()==='dark';
+    const gKey={board:'boardBy',list:'listBy',matrix:'matrixBy'}[view];
+    return {
+      tabs:VIEWS.map(([v,label])=>({label,set:()=>this.setState({view:v}),cls:onCls('vtab',view===v)})),
+      viewTitle:VIEWS.find(([v])=>v===view)[1],viewCount:plural(eps.length,'epic'),
+      isBoard:view==='board',isList:view==='list',isMatrix:view==='matrix',isTimeline:view==='timeline',
+      showGroupSeg:!!gKey,
+      groupOpts:gKey?(view==='matrix'?['app','theme']:['app','stage','theme']).map(v=>({label:LBL[v],set:()=>this.setState({[gKey]:v}),cls:onCls('',st[gKey]===v)})):[],
+      // The Details toggle is shared by List and Timeline.
+      showDetailsToggle:view==='list'||view==='timeline',details:st.details,detailsChk:chk(st.details),toggleDetails:()=>this.setState(s=>({details:!s.details})),
+      themeOpts:[['light','Light'],['dark','Dark'],['system','Follow computer']].map(([k,label])=>{const on=(st.theme||'system')===k;return {label,on:String(on),cls:onCls('',on),set:()=>this.setTheme(k)};}),
+      newEpic:()=>this.open({id:'e'+Date.now(),title:'',desc:'',app:APPS[0],theme:THEMES[0],stage:BACKLOG,health:'On track',ps:'',pe:'',fs:'',fe:'',as:'',ae:'',updates:[],audit:[]})
+    };
+  }
+
+  filterVals(all,eps){
+    const st=this.state;
+    const stagesDefault=st.fStages.length===DEFAULT_STAGES.length&&DEFAULT_STAGES.every(i=>st.fStages.includes(i));
+    const opts=(k,labels,valueOf)=>labels.map((label,i)=>{const v=valueOf?valueOf(i):label;
+      return {label,chk:chk(st[k].includes(v)),toggle:()=>this.setState(s=>({[k]:s[k].includes(v)?s[k].filter(x=>x!==v):[...s[k],v]}))};});
+    return {
+      filterOpen:st.filterOpen,toggleFilter:()=>this.setState(s=>({filterOpen:!s.filterOpen})),
+      fCount:st.fApps.length+st.fThemes.length+(stagesDefault?0:1),
+      fAppOpts:opts('fApps',APPS),fThemeOpts:opts('fThemes',THEMES),fStageOpts:opts('fStages',STAGES,i=>i).map((o,i)=>({...o,dot:stDot(i)})),
+      stagesAll:()=>this.setState({fStages:STAGES.map((s,i)=>i)}),
+      fSummary:'Showing '+eps.length+' of '+all.length+' epics'+(stagesDefault?' · Backlog and Done hidden':''),
+      clearFilters:()=>this.setState({fApps:[],fThemes:[],fStages:DEFAULT_STAGES})
+    };
+  }
+
+  boardVals(eps,keysIn){
+    const by=this.state.boardBy;
+    return {
+      boardGroups:this.groups(by,eps,keysIn(by)).map(g=>{const z=this.dropZone('b:'+g.label,patchFor(by,g.label),'Board'),si=by==='stage'?STAGES.indexOf(g.label):-1;
+        return {...g,over:z.over,drop:z.drop,bg:z.active?'var(--accent-tint)':si>=0?stTint(si,9):'var(--line)',ol:z.active?'2px dashed var(--accent)':'none',
+          top:'3px solid '+(si>=0?STAGE_C[si]:'transparent'),hc:si>=0?stInk(si):'var(--ink)'};}),
+      showCardApp:by!=='app',showCardStage:by!=='stage',dragEnd:()=>this.setState({dragId:null,overKey:null})
+    };
+  }
+
+  listVals(eps,keysIn){
+    const st=this.state,by=st.listBy,show=k=>by!==k&&st.details;
+    return {
+      listGroups:this.groups(by,eps,keysIn(by)).filter(g=>g.count).map(g=>{const si=by==='stage'?STAGES.indexOf(g.label):-1;
+        return {...g,hc:si>=0?stInk(si):'var(--ink)',bl:'4px solid '+(si>=0?STAGE_C[si]:'transparent'),hbg:si>=0?stTint(si,14):'var(--surface)',countTxt:plural(g.count,'epic')};}),
+      showListApp:show('app'),showListTheme:show('theme'),showListStage:show('stage')
+    };
+  }
+
+  matrixVals(eps,keysIn,passStage){
+    const by=this.state.matrixBy,cols=STAGES.map((s,i)=>i).filter(passStage);
+    return {
+      mGrid:{display:'grid',gridTemplateColumns:'150px repeat('+cols.length+',minmax(150px,1fr))',minWidth:(150+cols.length*150)+'px'},
+      stageCols:cols.map(i=>({label:STAGES[i],style:{padding:'8px 10px',fontWeight:700,fontSize:'13.5px',background:stTint(i,12),color:stInk(i),borderTop:'3px solid '+STAGE_C[i],borderBottom:'1px solid var(--line)',borderLeft:'1px solid var(--line)'}})),
+      matrixRows:keysIn(by).map(k=>({label:k,cells:cols.map(si=>{const z=this.dropZone('m:'+k+':'+si,{...patchFor(by,k),stage:si},'Matrix');
+        return {over:z.over,drop:z.drop,bg:z.active?'var(--accent-soft)':stTint(si,4),items:eps.filter(e=>keyOf(e,by)===k&&e.stage===si).map(e=>({...e,mOther:by==='theme'?e.app:e.theme}))};})})),
+      legend:LEGEND.map(h=>({label:h,dot:dot(h)}))
+    };
+  }
+
+  // One timeline bar: geometry plus the plan baseline, actual-date ticks and slip label.
+  bar(e,R0,mw,rowH){
+    const t=this.state.tdrag;if(t&&t.id===e.id)e={...e,...shiftF(e,t.mode,t.dm)};
+    // Bar = actual dates where known, otherwise forecast (falling back to plan). Plan is a grey baseline underneath.
+    const H=STATUS[statusOf(e)],done=e.stage===DONE;
+    const s0=abs(e.as||e.fs||e.ps);if(s0==null)return null;
+    const s1=(abs(e.ae||e.fe||e.pe)??s0)+1;
+    const p0=abs(e.ps),p1=e.pe?abs(e.pe)+1:null;
+    const x=m=>(m-R0)*mw;
+    const L=x(s0),R=Math.max(x(s1),L+4);
+    const bh=this.state.details?12:10,gap=2,base=4,top=Math.round((rowH-bh-gap-base)/2);
+    const hasPlan=p0!=null&&p1!=null&&p1>p0,slipM=slipOf(e);
+    const tick=left=>({position:'absolute',top:'-4px',height:(bh+8)+'px',left:(left-1)+'px',width:'2px',background:'var(--ink)',borderRadius:'1px',pointerEvents:'none'});
+    return {
+      box:{position:'absolute',top:top+'px',height:bh+'px',left:L+'px',width:(R-L)+'px',cursor:e.as||e.ae||done?'pointer':(t&&t.id===e.id?'grabbing':'grab')},
+      fill:{position:'absolute',inset:0,background:H.bd,borderRadius:'3px'},
+      // Finished work: dark green bar with a white check at its end, so it can't be mistaken for "on track".
+      done,check:{position:'absolute',right:'3px',top:'50%',transform:'translateY(-50%)',width:(bh-2)+'px',height:(bh-2)+'px',pointerEvents:'none'},
+      hasPlan,plan:hasPlan?{position:'absolute',top:(top+bh+gap)+'px',height:base+'px',left:x(p0)+'px',width:(x(p1)-x(p0))+'px',background:'var(--grey-fill)',borderRadius:'2px',pointerEvents:'none'}:{},
+      hasAS:!!e.as,tickS:tick(0),hasAE:!!e.ae,tickE:tick(R-L),
+      hasSlip:slipM>0,sl:{position:'absolute',top:(top-2)+'px',left:(R+6)+'px',fontSize:'11px',lineHeight:(bh+4)+'px',fontWeight:600,color:HEALTH.Late.fg,whiteSpace:'nowrap',pointerEvents:'none'},
+      slipTxt:'+'+slipM+' mo'
+    };
+  }
+
+  timelineVals(all,eps,keysIn){
+    const st=this.state;
+    // The range covers all epics (not just the filtered ones), so it stays put while filtering.
+    const starts=all.map(e=>abs(e.as||e.fs||e.ps)).filter(v=>v!=null),ends=all.map(e=>abs(e.ae||e.fe||e.pe)).filter(v=>v!=null);
+    const R0=Math.floor(Math.min(TODAY-6,...starts)/3)*3-3;
+    const R1=Math.ceil((Math.max(TODAY+18,...ends)+4)/3)*3;
+    const total=R1-R0;
+    const mw=Math.max(10,((st.cw||1100)-LABELW)/(st.nq*3));
+    this._mw=mw;this._R0=R0;
+    const W=total*mw,rowH=st.details?36:26;
+    const rowBorder='1px solid var(--line)';
+    const tRows=[];
+    const pushE=(list,ind)=>list.forEach(e=>{const bar=this.bar(e,R0,mw,rowH);tRows.push({...e,isE:true,tSub:e.app+' · '+e.theme+' · '+STAGES[e.stage],
+      labelStyle:{position:'sticky',left:0,zIndex:3,background:'var(--surface)',height:rowH+'px',boxSizing:'border-box',padding:'0 10px 0 '+(12+ind*14)+'px',display:'flex',flexDirection:'column',justifyContent:'center',minWidth:0,borderBottom:rowBorder,boxShadow:'1px 0 0 var(--line)'},
+      trackStyle:{position:'relative',height:rowH+'px',borderBottom:rowBorder},
+      // Actual dates are facts: once started only the forecast end can be dragged; once finished nothing can.
+      hasBar:!!bar,bar:bar||{},canStart:!e.as&&!e.ae&&!e.done,canEnd:!e.ae&&!e.done,barTip:e.title+' · '+e.forecastTxt,
+      downMove:this.barDown(e,e.as||e.ae||e.done?'none':'move'),downStart:this.barDown(e,'start'),downEnd:this.barDown(e,'end')});});
+    const gDot=(by,k)=>by==='stage'?stDot(STAGES.indexOf(k)):{display:'none'};
+    if(st.g1==='none')pushE(eps,0);
+    else keysIn(st.g1).forEach(k=>{const a=eps.filter(e=>keyOf(e,st.g1)===k);if(!a.length)return;tRows.push({isG1:true,label:k,count:a.length,gd:gDot(st.g1,k)});
+      if(st.g2==='none'||st.g2===st.g1)pushE(a,1);
+      else keysIn(st.g2).forEach(k2=>{const b=a.filter(e=>keyOf(e,st.g2)===k2);if(!b.length)return;tRows.push({isG2:true,label:k2,count:b.length,gd:gDot(st.g2,k2)});pushE(b,2);});});
+    const quarters=Array.from({length:total/3},(_,i)=>{const m=R0+i*3,y=Math.floor(m/12),q=Math.floor((m%12)/3);
+      return {label:'Q'+(q+1)+' '+(mw*3<70?'’'+String(y).slice(2):y),months:MON.slice(q*3,q*3+3),style:{flex:'none',width:(mw*3)+'px',boxSizing:'border-box',borderLeft:'1px solid var(--line)',padding:'4px 0 3px',minWidth:0}};});
+    return {
+      g1Opts:['app','theme','stage','none'].map(v=>({v,label:LBL[v],sel:st.g1===v})),
+      g2Opts:['none','theme','app','stage'].filter(v=>v==='none'||v!==st.g1).map(v=>({v,label:LBL[v],sel:st.g2===v})),
+      setG1:ev=>{const v=ev.target.value;this.setState(s=>({g1:v,g2:s.g2===v||v==='none'?'none':s.g2}));},
+      setG2:ev=>this.setState({g2:ev.target.value}),
+      qOpts:[4,6,8,12].map(n=>({label:String(n),cls:onCls('',st.nq===n),set:()=>{if(this._sc)this._keepLeft=this._sc.scrollLeft/this._mw;this.setState({nq:n});}})),
+      shiftBack:()=>this._sc&&this._sc.scrollBy({left:-mw*3,behavior:'smooth'}),shiftFwd:()=>this._sc&&this._sc.scrollBy({left:mw*3,behavior:'smooth'}),goToday:()=>this.scrollToday(),
+      scRef:this.scRef,tGrid:{display:'grid',gridTemplateColumns:LABELW+'px '+W+'px',width:(LABELW+W)+'px',position:'relative'},
+      quarters,showMonths:mw>=18,
+      gridLines:{position:'absolute',top:0,bottom:0,left:LABELW+'px',width:W+'px',pointerEvents:'none',backgroundImage:'linear-gradient(to right,var(--line) 1px,transparent 1px)',backgroundSize:(mw*3)+'px 100%'},
+      tRows,todayStyle:{position:'absolute',top:0,bottom:0,left:(LABELW+(TODAY-R0)*mw)+'px',width:'2px',background:'var(--ink)',zIndex:2,pointerEvents:'none'},
+      tLegend:LEGEND.map(h=>({label:h,done:h==='Done',sw:{position:'relative',display:'inline-flex',alignItems:'center',justifyContent:'flex-end',width:'24px',height:'10px',borderRadius:'3px',background:STATUS[h].bd}})),
+      confirmOpen:!!st.confirm,cf:st.confirm||{},cancelConfirm:()=>this.cancelConfirm(),applyConfirm:()=>this.applyConfirm()
+    };
+  }
+
+  // The month picker for date field `key`, or null when it is closed.
+  pickerFor(key){
+    const p=this.state.picker,d=this.state.draft;
+    if(!p||p.key!==key)return null;
+    const cur=d[key],cy=cur?Number(cur.slice(0,4)):null,cm=cur?Number(cur.slice(5,7)):null,thisY=NOW.getFullYear();
+    return {
+      prev:()=>this.setState(s=>({picker:{...s.picker,base:s.picker.base-1}})),
+      next:()=>this.setState(s=>({picker:{...s.picker,base:s.picker.base+1}})),
+      years:[p.base-1,p.base,p.base+1].map(y=>({label:String(y),cls:'pk year'+(y===p.year?' on':'')+(y===thisY?' now':''),set:()=>this.setState(s=>({picker:{...s.picker,year:y}}))})),
+      months:MON.map((m,i)=>({label:m,cls:'pk month'+(cy===p.year&&cm===i+1?' on':''),set:()=>{this.setD(key,p.year+'-'+String(i+1).padStart(2,'0'));this.setState({picker:null});}})),
+      clear:()=>{this.setD(key,'');this.setState({picker:null});}
+    };
+  }
+
+  modalVals(){
+    const st=this.state,d=st.draft;
+    if(!d)return {modalOpen:false,d:{},on:{},dateRows:[],pk:{},rtabs:[],history:[],dUpdates:[],healthBtns:[]};
+    const field=k=>ev=>this.setD(k,ev.target.value);
+    const dSlipM=slipOf(d);
+    let pk={};
+    const dateRows=[['Planned','ps','pe'],['Forecast','fs','fe'],['Actual','as','ae']].map(([label,a,b])=>({label,cells:[a,b].map(k=>{const p=this.pickerFor(k);if(p)pk=p;
+      return {open:!!p,txt:d[k]?fl(d[k]):'Select',color:d[k]?'var(--ink)':'var(--ink-3)',
+        toggle:()=>{if(st.picker&&st.picker.key===k){this.setState({picker:null});return;}const y=d[k]?Number(d[k].slice(0,4)):NOW.getFullYear();this.setState({picker:{key:k,year:y,base:y}});}};})}));
+    return {
+      modalOpen:true,closeModal:()=>this.close(),stop:ev=>ev.stopPropagation(),save:()=>this.save(),
+      d,on:{title:field('title'),desc:field('desc'),app:field('app'),theme:field('theme'),stage:ev=>this.setD('stage',Number(ev.target.value))},
+      appList:APPS,themeList:THEMES,stageOpts:STAGES.map((s,i)=>({v:i,label:s})),dStageDot:stDot(d.stage),
+      showHealth:d.stage!==BACKLOG&&d.stage!==DONE,
+      healthBtns:Object.keys(HEALTH).map(h=>{const sel=d.health===h;return {label:h,set:()=>this.setD('health',h),
+        style:{display:'inline-flex',alignItems:'center',gap:'4px',height:'28px',padding:'0 12px',borderRadius:'999px',cursor:'pointer',fontSize:'12.5px',fontWeight:600,border:'1px solid '+(sel?HEALTH[h].bd:'var(--line-strong)'),background:sel?HEALTH[h].bg:'var(--surface)',color:sel?HEALTH[h].fg:'var(--ink-2)'}};}),
+      dateRows,pk,closePicker:()=>this.setState({picker:null}),
+      dSlip:dSlipM>0,dSlipTxt:(d.ae?'Actual':'Forecast')+' end is '+dSlipM+' month'+(dSlipM>1?'s':'')+' later than planned',
+      rtabs:[['updates','Status updates',d.updates.length],['history','History',d.audit.length]].map(([v,label,n])=>({label,n,cls:onCls('mtab',st.rtab===v),set:()=>this.setState({rtab:v})})),
+      isUpdatesTab:st.rtab==='updates',isHistoryTab:st.rtab==='history',
+      history:d.audit.slice().sort(byDateDesc).map(a=>{const cut=(f,v)=>{const s=fmtVal(f,v);return s.length>48?s.slice(0,45)+'…':s;};const ch=a.changes||[];
+        return {changed:!a.created,author:a.author,initials:initials(a.author),
+          summary:a.created?'created this epic':'changed '+plural(ch.length,'field'),
+          changes:ch.map(c=>({field:FLBL[c.field]||c.field,from:cut(c.field,c.from),to:cut(c.field,c.to)})),
+          when:rel(a.date),full:fullDT(a.date),via:a.via&&a.via!=='Modal'?'via '+a.via:''};}),
+      noHistory:!d.audit.length,
+      newUpd:st.newUpd,setNewUpd:ev=>this.setState({newUpd:ev.target.value}),noUpd:!st.newUpd.trim(),addUpdate:()=>this.addUpdate(),
+      dUpdates:d.updates.slice().sort(byDateDesc).map(u=>({...u,when:rel(u.date),full:fullDT(u.date),initials:initials(u.author)})),
+      noUpdates:!d.updates.length
+    };
+  }
+}
+</script>
+</body>
+</html>

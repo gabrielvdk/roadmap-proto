@@ -1,0 +1,2 @@
+# Vendored files must stay byte-identical to their upstream releases (SECURITY.md section 6).
+app/vendor/** -text
