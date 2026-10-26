@@ -84,7 +84,7 @@ Define these on `:root` and use them everywhere. Never hard-code colors in compo
 | `--grey-fill` | `#8A95A6` | `#7D8898` | neutral markers |
 | `--done` | `#0A5A42` | `#1E8A66` | finished work (darker than `--green-deep`, always with a ✓) |
 
-**Dark mode** follows the OS, with an explicit override. A small round toggle fixed at the bottom right switches light/dark; it sets `data-theme` on `<html>` and remembers the choice per browser (`localStorage`, one key per app, applied in `<head>` to avoid a flash).
+**Dark mode** follows the OS, with an explicit override: **Light / Dark / Follow computer**, as a segmented control (`.seg`), never a floating button. Where it lives: on the profile or settings page if the app has one (EOS Tracker: Profile → Appearance), otherwise in a small footer under the page (Roadmapper: "Appearance" in the footer). It sets `data-theme` on `<html>` (removed for "Follow computer") and remembers the choice per browser (`localStorage`, one key per app, applied in `<head>` to avoid a flash).
 
 ```css
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ /* dark values */ } }

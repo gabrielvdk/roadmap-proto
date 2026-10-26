@@ -80,7 +80,7 @@ The server sends `no-store`, so a reload shows the latest edit, but it reads `st
 - Never use `window.confirm()`, `alert()` or `prompt()`; they're blocked in the browser pane. Use an in-app dialog (see the forecast confirm dialog).
 - Keep the user's earlier UX decisions:
   - List: a "Details" checkbox hides Application/Theme/Stage lines; it shares `details` with the Timeline toggle
-  - light/dark toggle: round button fixed bottom right, cloned from EOSTracker; key `lg-roadmap-theme`, applied by `boot.js` before first paint
+  - light/dark: an "Appearance" switch (Light / Dark / Follow computer, `.seg`) in the footer under the page (`themeOpts` in `headerVals`, `setTheme(mode)`; "Follow computer" removes the choice), matching EOSTracker's Profile → Appearance (see `DESIGN.md`); key `lg-roadmap-theme`, applied by `boot.js` before first paint. No floating button.
   - no stage numbers or subtitles
   - no Productization track
   - the List hides the attribute it's grouped by

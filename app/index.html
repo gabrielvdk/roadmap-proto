@@ -67,7 +67,7 @@
 </div>
 </div>
 
-<main style="flex:1;padding:14px 24px 72px;min-width:0">
+<main style="flex:1;padding:14px 24px 18px;min-width:0">
 
 <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:8px">
@@ -176,7 +176,7 @@
 </sc-if>
 
 </main>
-<button onClick="{{ toggleTheme }}" type="button" title="{{ themeTxt }}" aria-label="{{ themeAria }}" style="position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:12;width:38px;height:38px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);padding:0;cursor:pointer" style-hover="color:var(--accent);border-color:var(--accent)"><sc-if value="{{ isDarkTheme }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><circle cx="10" cy="10" r="3.6"></circle><path d="M10 1.8v2M10 16.2v2M1.8 10h2M16.2 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"></path></svg></sc-if><sc-if value="{{ isLightTheme }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" aria-hidden="true"><path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a7 7 0 1 0 8.8 8.8z"></path></svg></sc-if></button>
+<footer style="padding:4px 24px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-3)"><span>Appearance</span><div class="seg"><sc-for list="{{ themeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.set }}" type="button" class="{{ o.cls }}" aria-pressed="{{ o.on }}" style="height:26px;font-size:12.5px">{{ o.label }}</button></sc-for></div><span>· saved in this browser</span></footer>
 
 <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
 <div class="backdrop" style="z-index:40;align-items:center">
@@ -458,7 +458,9 @@ class Component extends DCLogic {
 
   // ---------- Light/dark: follows the OS until the user picks one; the choice is remembered per browser ----------
   effTheme(){return this.state.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
-  toggleTheme(){const t=this.effTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem(THEME_KEY,t);}catch(e){}this.setState({theme:t});}
+  // light / dark / follow the computer (the footer's Appearance switch, like EOS Tracker's Profile → Appearance)
+  setTheme(m){if(m==='system'){document.documentElement.removeAttribute('data-theme');try{localStorage.removeItem(THEME_KEY);}catch(e){}this.setState({theme:null});return;}
+    document.documentElement.setAttribute('data-theme',m);try{localStorage.setItem(THEME_KEY,m);}catch(e){}this.setState({theme:m});}
 
   // ---------- Timeline scrolling: measure the scroller width, scroll to today on first show ----------
   scRef=el=>{
@@ -542,7 +544,7 @@ class Component extends DCLogic {
       groupOpts:gKey?(view==='matrix'?['app','theme']:['app','stage','theme']).map(v=>({label:LBL[v],set:()=>this.setState({[gKey]:v}),cls:onCls('',st[gKey]===v)})):[],
       // The Details toggle is shared by List and Timeline.
       showDetailsToggle:view==='list'||view==='timeline',details:st.details,detailsChk:chk(st.details),toggleDetails:()=>this.setState(s=>({details:!s.details})),
-      themeTxt:dark?'Light mode':'Dark mode',themeAria:dark?'Switch to light mode':'Switch to dark mode',isDarkTheme:dark,isLightTheme:!dark,toggleTheme:()=>this.toggleTheme(),
+      themeOpts:[['light','Light'],['dark','Dark'],['system','Follow computer']].map(([k,label])=>{const on=(st.theme||'system')===k;return {label,on:String(on),cls:onCls('',on),set:()=>this.setTheme(k)};}),
       newEpic:()=>this.open({id:'e'+Date.now(),title:'',desc:'',app:APPS[0],theme:THEMES[0],stage:BACKLOG,health:'On track',ps:'',pe:'',fs:'',fe:'',as:'',ae:'',updates:[],audit:[]})
     };
   }
