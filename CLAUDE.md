@@ -91,3 +91,8 @@ The server sends `no-store`, so a reload shows the latest edit, but it reads `st
 - **Finished Epics:** built as the **Done** stage (with Backlog as the counterpart before the pipeline). Possible next step: a close outcome (Completed / Stopped / Superseded) and "Create follow-up Epic" for Expand/Fix outcomes from Learn.
 - **Later, a real app:** shared backend, users and authentication, server-side audit, and admin-editable lists. Keep that in mind, but don't over-engineer the prototype.
 - **Strict CSP:** the runtime compiles the logic with `new Function`, so the CSP needs `'unsafe-eval'` (accepted residual risk, `SECURITY.md` §4.1). Removing it means porting `app/index.html` to a precompiled React bundle without `support.js`.
+
+## Where things stand (2026-10-26)
+- The `hardening` branch (Azure hardening + restructure into `app/`, byte-identical vendor files, and the Appearance switch) is **merged into `main`**. `main` is **not pushed** yet: pushing publishes it on GitHub Pages (this repo is public) and is the user's call. `hardening` can be deleted once `main` is pushed.
+- The **Appearance** change came from the EOSTracker chat, to keep both apps consistent: EOSTracker moved its light/dark choice to Profile → Appearance and Help to a footer, so Roadmapper (no profile page) got the same Light / Dark / Follow computer switch in a footer. The rule is in `DESIGN.md` (same text in both repos). If you change the theme recipe, change `DESIGN.md` here **and** in `../EOStracker`.
+- EOSTracker's `.claude/launch.json` also has a `roadmapper` entry (port 8090), so either chat can preview both apps.
